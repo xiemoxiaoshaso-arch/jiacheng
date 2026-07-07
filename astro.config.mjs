@@ -12,8 +12,8 @@ EventEmitter.defaultMaxListeners = 30;
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://xiemoxiaoshaso-arch.github.io', // 👈 已修改：设置为您的 GitHub 域名
-  base: '/jiacheng',                             // 👈 已新增：设置为您的仓库子路径
+  site: 'https://jcnewenergy.dpdns.or', // 👈 已修改：设置为您的 GitHub 域名
+  base: '/',                             // 👈 已新增：设置为您的仓库子路径
 
   integrations: [mdx(), sitemap()],
 
