@@ -4,6 +4,10 @@ lang: "en"
 category: "Pack"
 chemistry: "Lithium Iron Phosphate (LFP)"
 image: "../../assets/images/pack-51v-100ah.jpg"
+images:                             # 👈 新增多图列表，填入不同角度的图片路径
+  - "../../assets/images/cell-280ah-1.png"    # 角度1（正面）
+  - "../../assets/images/cell-280ah-2.png"    # 角度2（接线端子侧面占位）
+  - "../../assets/images/cell-280ah-3.png"    # 角度3（背面或细节占位）
 datasheet: "/pdfs/Pack-51v-100ah-Datasheet.pdf"
 specs:
   - name: "Nominal Voltage"
