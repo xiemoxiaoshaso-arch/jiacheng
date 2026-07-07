@@ -1,9 +1,9 @@
 ---
 // 获取当前网页的真实路径，以及 Astro 自动识别的当前语言状态
-const base = import.meta.env.BASE_URL.replace(/\/$/, ''); // 👈 新增：去除尾部斜杠的项目基础路径（本地为 ''，线上为 '/jiacheng'）
+const base = import.meta.env.BASE_URL.replace(/\/$/, ''); // 去除尾部斜杠的项目基础路径（本地为 ''，线上为 '/jiacheng'）
 let pathname = Astro.url.pathname;
 
-// 👈 新增：如果路径中带有基础路径前缀，将其剥离，防止干扰中英文高亮和切换逻辑
+// 如果路径中带有基础路径前缀，将其剥离，防止干扰中英文高亮和切换逻辑
 if (base && pathname.startsWith(base)) {
   pathname = pathname.substring(base.length);
 }
@@ -13,13 +13,19 @@ if (!pathname.startsWith('/')) {
 
 const currentLang = Astro.currentLocale || 'zh'; // 'zh' 或 'en'
 
-// 👈 新增：统一处理链接的辅助函数（自动在打包时补全 /jiacheng 前缀）
+// 👈 新增：定义 Props 接口，允许外部组件传入精准切换路径
+interface Props {
+  langAlt?: string;
+}
+const { langAlt } = Astro.props;
+
+// 统一处理链接的辅助函数（自动在打包时补全 /jiacheng 前缀）
 const resolveUrl = (path: string) => {
   if (path === '/') return base || '/';
   return `${base}${path}`;
 };
 
-// 判断当前路径是否与菜单匹配 (基于剥离了 base 的 pathname 运算，最安全)
+// 判断当前路径是否与菜单匹配
 const isActive = (path: string) => {
   if (path === '/' || path === '/en') {
     return pathname === '/' || pathname === '/en' || pathname === '';
@@ -27,7 +33,7 @@ const isActive = (path: string) => {
   return pathname.startsWith(path);
 };
 
-// 💡 菜单配置（保持原样，无需手动去加 /jiacheng）
+// 菜单配置
 const menuTranslations = {
   zh: [
     { name: '首页', href: '/' },
@@ -49,8 +55,11 @@ const menuTranslations = {
 
 const menuItems = menuTranslations[currentLang];
 
-// 计算切换语言时的目标网址（基于纯净的 pathname 运算）
+// 计算切换语言时的目标网址
 const getTargetLangHref = () => {
+  // 👈 新增：如果外部传入了精准跳转路径（多语言详情页），优先使用它
+  if (langAlt) return langAlt; 
+
   if (currentLang === 'zh') {
     // 中文切英文：在路径前加上 /en
     return pathname === '/' ? '/en' : `/en${pathname}`;
@@ -65,7 +74,7 @@ const getTargetLangHref = () => {
 <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 py-4 px-6 md:px-8 sticky top-0 z-50 shadow-[0_2px_15px_rgba(0,0,0,0.01)] relative">
   <div class="max-w-7xl mx-auto flex justify-between items-center">
     
-    <!-- 左侧：公司品牌 LOGO (通过 resolveUrl 动态包装路径) -->
+    <!-- 左侧：公司品牌 LOGO -->
     <a href={resolveUrl(currentLang === 'zh' ? '/' : '/en')} class="flex items-center shrink-0 group select-none">
       <img 
         src={resolveUrl('/images/logo.png')} 
@@ -82,7 +91,7 @@ const getTargetLangHref = () => {
       </div>
     </a>
 
-    <!-- 中间：导航菜单栏 (通过 resolveUrl 动态包裹 item.href) -->
+    <!-- 中间：导航菜单栏 -->
     <nav class="hidden lg:flex items-center space-x-6 xl:space-x-8 text-sm font-semibold">
       {menuItems.map(item => (
         <a 
@@ -101,16 +110,17 @@ const getTargetLangHref = () => {
     <!-- 右侧：语言切换 + B2B 快速获取报价按钮 -->
     <div class="flex items-center gap-4">
       
-      <!-- 🌐 中 / EN 一键切换 (通过 resolveUrl 动态包裹) -->
+      <!-- 🌐 中 / EN 一键切换 -->
+      <!-- 👈 修改：不再在详情页中写死，统一使用封装了 langAlt 的 getTargetLangHref 逻辑，无需二次 wrap resolveUrl -->
       <a 
-        href={resolveUrl(getTargetLangHref())} 
+        href={langAlt ? langAlt : resolveUrl(getTargetLangHref())} 
         class="text-xs font-bold px-2.5 py-1.5 rounded-md border border-slate-200 text-slate-500 hover:text-green-600 hover:border-green-600/30 transition-all flex items-center gap-1 cursor-pointer select-none font-mono"
         title={currentLang === 'zh' ? 'Switch to English' : '切换至中文版'}
       >
         🌐 {currentLang === 'zh' ? 'EN' : '中'}
       </a>
 
-      <!-- 获取报价按钮 (通过 resolveUrl 动态包裹) -->
+      <!-- 获取报价按钮 -->
       <a 
         href={resolveUrl(currentLang === 'zh' ? '/contact' : '/en/contact')} 
         class="hidden sm:inline-block px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold text-xs rounded-lg transition-all shadow-md shadow-green-600/10"
@@ -128,7 +138,7 @@ const getTargetLangHref = () => {
 
   </div>
 
-  <!-- 📱 移动端下拉菜单 (通过 resolveUrl 动态包裹) -->
+  <!-- 📱 移动端下拉菜单 -->
   <div 
     id="mobile-menu" 
     class="hidden lg:hidden absolute top-full left-0 right-0 bg-white border-b border-slate-200 shadow-xl px-6 py-6 space-y-4 flex flex-col z-50 transition-all"
@@ -146,7 +156,7 @@ const getTargetLangHref = () => {
 
     <!-- 移动端一键语言切换 -->
     <a 
-      href={resolveUrl(getTargetLangHref())}
+      href={langAlt ? langAlt : resolveUrl(getTargetLangHref())}
       class="py-2.5 text-sm font-bold border-b border-slate-100 flex items-center gap-1 text-slate-600"
     >
       🌐 {currentLang === 'zh' ? '切换至 English' : 'Switch to Chinese'}
@@ -161,7 +171,7 @@ const getTargetLangHref = () => {
   </div>
 </header>
 
-<!-- ----------------- 🚀 原生高性能手机端切换脚本 ----------------- -->
+<!-- 手机端切换脚本 -->
 <script is:inline>
   const menuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');

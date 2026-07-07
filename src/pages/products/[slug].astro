@@ -46,7 +46,7 @@ const resolvedDatasheet = resolveUrl(datasheet);
 <body class="bg-slate-50 text-slate-800 antialiased font-sans">
 
   <!-- 顶部导航栏 -->
-  <Header />
+  <Header langAlt={resolveUrl(`/en/products/${products.id}-en`)} />
 
   <main class="max-w-7xl mx-auto px-4 py-12 space-y-8">
     <!-- 面包屑导航 -->

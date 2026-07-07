@@ -38,7 +38,7 @@ const { Content } = await render(news);
 <body class="bg-slate-50 text-slate-800 font-sans leading-normal tracking-normal antialiased">
 
   <!-- 1. 导航栏 -->
-  <Header />
+  <Header langAlt={resolveUrl(`/en/news/${news.id}-en`)} />
 
   <!-- 2. 正文 -->
   <main class="max-w-4xl mx-auto px-4 py-12">

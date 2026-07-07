@@ -61,7 +61,7 @@ const getCleanSpecName = (name: string) => {
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
   <!-- 1. Universal Header Navigation -->
-  <Header />
+  <Header langAlt={resolveUrl(`/products/${product.id.replace('-en', '')}`)} />
 
   <!-- 2. Main Content Container -->
   <main class="max-w-7xl mx-auto px-4 py-12 space-y-8">
