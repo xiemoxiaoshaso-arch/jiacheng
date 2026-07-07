@@ -30,6 +30,7 @@ const newsCollection = defineCollection({
     date: z.string(),                           
     views: z.string(),                          
     image: image(), // 👈 核心修改：从 z.string() 变更为 image() 助手
+    excerpt: z.string().optional(), // 👈 顺便加上这行，确保摘要字段被安全识别
   }),
 });
 

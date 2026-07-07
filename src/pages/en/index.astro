@@ -1,7 +1,15 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets'; // 👈 新增：引入 Astro 官方图片优化组件
 import '../../styles/global.css'; // 👈 引入样式（相对路径已调整）
 import Header from '../../components/Header.astro'; // 👈 引入通用双语导航（相对路径已调整）
+
+// 👈 新增：统一处理链接的辅助函数（自动补全自定义域名根路径或本地子路径前缀）
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const resolveUrl = (path: string) => {
+  if (path === '/') return base || '/';
+  return `${base}${path}`;
+};
 
 // 动态拉取产品库中的所有电池
 const allProducts = await getCollection('products');
@@ -39,10 +47,12 @@ const featuredProducts = englishProducts.slice(0, 2);
           We focus on the R&D and system integration of high-safety, long-life Lithium Iron Phosphate (LFP) cells. With a planned annual capacity of 15 GWh, we deliver one-stop customized power & ESS solutions.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 pt-4">
-          <a href="/en/products" class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-center font-bold rounded-lg shadow-lg transition-colors">
+          <!-- 👈 修改：使用 resolveUrl 包装跳转链接 -->
+          <a href={resolveUrl('/en/products')} class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-center font-bold rounded-lg shadow-lg transition-colors">
             Browse Products ➔
           </a>
-          <a href="/en/contact" class="px-8 py-4 border border-slate-500 hover:border-white text-center font-bold rounded-lg transition-colors">
+          <!-- 👈 修改：使用 resolveUrl 包装跳转链接 -->
+          <a href={resolveUrl('/en/contact')} class="px-8 py-4 border border-slate-500 hover:border-white text-center font-bold rounded-lg transition-colors">
             Get Bulk Quote
           </a>
         </div>
@@ -119,7 +129,8 @@ const featuredProducts = englishProducts.slice(0, 2);
           Selected high energy density cells and highly compatible energy storage packs with automotive-grade quality assurance.
         </p>
       </div>
-      <a href="/en/products" class="mt-4 md:mt-0 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-2">
+      <!-- 👈 修改：使用 resolveUrl 包装跳转链接 -->
+      <a href={resolveUrl('/en/products')} class="mt-4 md:mt-0 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-2">
         All Products ➔
       </a>
     </div>
@@ -142,7 +153,8 @@ const featuredProducts = englishProducts.slice(0, 2);
               </div>
               
               <div class="h-56 w-full bg-slate-50 rounded-xl flex items-center justify-center p-6 mb-6 border border-slate-100">
-                <img src={product.data.image} alt={product.data.title} class="max-h-full object-contain" />
+                <!-- 👈 修改：改用 Astro 官方的 <Image /> 优化组件，自动适配打包流 -->
+                <Image src={product.data.image} alt={product.data.title} class="max-h-full object-contain" />
               </div>
 
               <h3 class="text-2xl font-bold text-slate-900 mb-3">{product.data.title}</h3>
@@ -164,7 +176,8 @@ const featuredProducts = englishProducts.slice(0, 2);
             </div>
 
             <div class="px-8 pb-8 bg-white">
-              <a href={`/en/products/${product.id}`} class="block w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-center text-sm font-bold rounded-xl shadow-sm transition-colors">
+              <!-- 👈 修改：使用 resolveUrl 包装详情跳转 -->
+              <a href={resolveUrl(`/en/products/${product.id}`)} class="block w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-center text-sm font-bold rounded-xl shadow-sm transition-colors">
                 View Specifications ➔
               </a>
             </div>
@@ -220,9 +233,10 @@ const featuredProducts = englishProducts.slice(0, 2);
       <div>
         <h4 class="text-white font-bold text-sm mb-4">Product Center</h4>
         <ul class="space-y-2 text-xs">
-          <li><a href="/en/products" class="hover:text-white transition-colors">ESS Batteries</a></li>
-          <li><a href="/en/products" class="hover:text-white transition-colors">E-Mobility series</a></li>
-          <li><a href="/en/products" class="hover:text-white transition-colors">Industrial Packs</a></li>
+          <!-- 👈 修改：页脚里的三个跳转链接同样需要用 resolveUrl 包裹 -->
+          <li><a href={resolveUrl('/en/products')} class="hover:text-white transition-colors">ESS Batteries</a></li>
+          <li><a href={resolveUrl('/en/products')} class="hover:text-white transition-colors">E-Mobility series</a></li>
+          <li><a href={resolveUrl('/en/products')} class="hover:text-white transition-colors">Industrial Packs</a></li>
         </ul>
       </div>
       <div>

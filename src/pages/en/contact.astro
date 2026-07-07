@@ -1,46 +1,45 @@
 ---
 import '../../styles/global.css';
 import Header from '../../components/Header.astro'; // 引入品牌绿智能导航
+
+// 👈 新增：统一处理链接和公开静态资源路径的辅助函数（自动补全域名根路径前缀）
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const resolveUrl = (path: string) => {
+  if (path === '/') return base || '/';
+  return `${base}${path}`;
+};
 ---
 
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <!-- 自适应视口标签，确保手机端比例 100% 正确 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>联系我们 - 嘉程新能源</title>
+  <title>Contact Us - JC New Energy</title>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans">
 
-  <!-- 1. 智能导航栏 (自动点亮“联系我们”和“在线留言”) -->
+  <!-- 1. Universal Smart Header (Will highlight "Contact Us" automatically) -->
   <Header />
 
-  <!-- 2. 🌟 品牌定制·联系我们高清无界微光巨幕 Banner (与简介页、新闻页 100% 像素级对齐，高透亮白字) -->
+  <!-- 2. Widescreen Cinematic Banner (Using resolveUrl to adapt path safely) -->
   <section class="relative w-full h-[300px] md:h-[400px] overflow-hidden flex items-center justify-center bg-slate-950 border-b border-slate-200/60">
-    <!-- 背景大图 (可放入一张展现客服、商务交流或企业大厦的前沿图) -->
     <img 
-      src={`${import.meta.env.BASE_URL}/images/contact-banner.jpg`}
-      alt="嘉程联系我们" 
+      src={resolveUrl('/images/contact-banner.jpg')} 
+      alt="Contact JC New Energy" 
       class="absolute inset-0 w-full h-full object-cover opacity-95 hover:scale-[1.02] transition-transform duration-[10000ms] ease-out"
     />
     
-    <!-- 电影级暗色偏光罩：提供顶级的白色文字对比度底座 -->
     <div class="absolute inset-0 bg-slate-950/35 pointer-events-none"></div>
-    
-    <!-- 极淡绿蓝微光层 (Logo 绿蓝两色呼应) -->
     <div class="absolute inset-0 bg-gradient-to-tr from-green-500/10 via-transparent to-blue-500/10 pointer-events-none"></div>
-    
-    <!-- 精准底部羽化：高度严格限制在 96px 且固定于底端，只用于平滑融入下方纯白 -->
-    <!-- 调整为极淡、极矮的渐变（高度缩减至 40px，最大不透明度仅为 30%，彻底消融死白带） -->
     <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/30 to-transparent pointer-events-none"></div>
 
-    <!-- Banner 内部文字 (字色升级为纯白 text-white 并带有 3D 投影，100% 锐利高可读，防单字断行) -->
     <div class="relative z-10 max-w-5xl mx-auto text-center px-6 space-y-4">
       <span class="inline-block px-3 py-1 bg-green-500/20 text-green-300 text-[10px] font-bold tracking-widest uppercase rounded-full border border-green-500/30 animate-pulse">
-        联系我们 // CONTACT US
+        CONTACT US
       </span>
       <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.3)] md:whitespace-nowrap">
-        <span class="inline-block">开启您的，</span><span class="inline-block">绿色能源定制方案</span>
+        <span class="inline-block">Start Your Customized</span> <span class="inline-block">Green Energy Solution</span>
       </h1>
       <p class="text-green-400 font-extrabold text-[10px] md:text-xs tracking-wider uppercase font-mono drop-shadow-[0_1px_5px_rgba(0,0,0,0.3)]">
         KICKSTART YOUR ZERO-CARBON JOURNEY WITH EXPERT BATTERY SOLUTIONS
@@ -48,83 +47,83 @@ import Header from '../../components/Header.astro'; // 引入品牌绿智能导�
     </div>
   </section>
 
-  <!-- 3. 企业简介正文过渡区 (纯白通栏区) -->
+  <!-- 3. Intro Transition Section -->
   <section class="w-full bg-white py-12 border-b border-slate-100">
     <div class="max-w-4xl mx-auto text-center px-6">
       <p class="text-slate-500 text-xs md:text-sm leading-relaxed max-w-xl mx-auto font-medium">
-        无论是标准的磷酸铁锂（LFP）电芯采购，还是复杂的工商业液冷储能系统（ESS）定制开发，我们的资深工程师团队都将在 24 小时内为您提供专业回复。
+        Whether you require standard Lithium Iron Phosphate (LFP) cell procurement or complex customized development for Commercial & Industrial liquid-cooled energy storage systems (ESS), our senior engineering team will provide a professional response within 24 hours.
       </p>
     </div>
   </section>
 
   <main class="max-w-7xl mx-auto px-4 py-12">
-    <!-- 主排版：左右大分栏 -->
+    <!-- Main Grid Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       
-      <!-- ================== 左边：全球联络网卡片 (lg:col-span-5) ================== -->
+      <!-- ================== Left: Global Contact Network (lg:col-span-5) ================== -->
       <div class="lg:col-span-5 space-y-6">
         
-        <!-- 亚太总部 -->
+        <!-- APAC HQ -->
         <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm space-y-4 hover:shadow-md transition-shadow">
           <div class="flex items-center gap-2">
             <span class="text-xl">🇨🇳</span>
-            <h3 class="font-extrabold text-slate-900 text-base">亚太总部·智造与研发中心</h3>
+            <h3 class="font-extrabold text-slate-900 text-base">APAC HQ • Manufacturing & R&D Center</h3>
           </div>
           <div class="space-y-2 text-xs text-slate-500 font-medium">
             <p class="flex items-start gap-2">
-              <span class="text-slate-400 font-bold">📍 地址:</span>
-              <span>中国·国家级高新技术产业园区新能源路 88 号</span>
+              <span class="text-slate-400 font-bold">Address:</span>
+              <span>No. 88, New Energy Road, National High-tech Industrial Zone, China</span>
             </p>
             <p class="flex items-center gap-2">
-              <span class="text-slate-400 font-bold">📞 电话:</span>
+              <span class="text-slate-400 font-bold">Tel:</span>
               <span>+86 (512) 8888-8888</span>
             </p>
             <p class="flex items-center gap-2">
-              <span class="text-slate-400 font-bold">✉️ 邮箱:</span>
+              <span class="text-slate-400 font-bold">Email:</span>
               <a href="mailto:info@jc-batteryway.com" class="text-green-600 hover:underline">info@jc-batteryway.com</a>
             </p>
           </div>
         </div>
 
-        <!-- 欧洲技术中心 -->
+        <!-- Europe Technical Center -->
         <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm space-y-4 hover:shadow-md transition-shadow">
           <div class="flex items-center gap-2">
             <span class="text-xl">🇩🇪</span>
-            <h3 class="font-extrabold text-slate-900 text-base">欧洲服务与仓储中心</h3>
+            <h3 class="font-extrabold text-slate-900 text-base">Europe Service & Warehousing Center</h3>
           </div>
           <div class="space-y-2 text-xs text-slate-500 font-medium">
             <p class="flex items-start gap-2">
-              <span class="text-slate-400 font-bold">📍 地址:</span>
+              <span class="text-slate-400 font-bold">Address:</span>
               <span>Frankfurter Str. 120, 60329 Frankfurt am Main, Germany</span>
             </p>
             <p class="flex items-center gap-2">
-              <span class="text-slate-400 font-bold">📞 电话:</span>
+              <span class="text-slate-400 font-bold">Tel:</span>
               <span>+49 (0) 69 12345678</span>
             </p>
             <p class="flex items-center gap-2">
-              <span class="text-slate-400 font-bold">✉️ 邮箱:</span>
+              <span class="text-slate-400 font-bold">Email:</span>
               <a href="mailto:eu-support@jc-batteryway.com" class="text-green-600 hover:underline">eu-support@jc-batteryway.com</a>
             </p>
           </div>
         </div>
 
-        <!-- 北美商务办事处 -->
+        <!-- North America Sales Office -->
         <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm space-y-4 hover:shadow-md transition-shadow">
           <div class="flex items-center gap-2">
             <span class="text-xl">🇺🇸</span>
-            <h3 class="font-extrabold text-slate-900 text-base">北美商务与售后中心</h3>
+            <h3 class="font-extrabold text-slate-900 text-base">North America Business & After-Sales Center</h3>
           </div>
           <div class="space-y-2 text-xs text-slate-500 font-medium">
             <p class="flex items-start gap-2">
-              <span class="text-slate-400 font-bold">📍 地址:</span>
+              <span class="text-slate-400 font-bold">Address:</span>
               <span>2051 S. El Camino Real, San Mateo, CA 94403, USA</span>
             </p>
             <p class="flex items-center gap-2">
-              <span class="text-slate-400 font-mono">📞 Tel:</span>
+              <span class="text-slate-400 font-mono">Tel:</span>
               <span>+1 (650) 999-9999</span>
             </p>
             <p class="flex items-center gap-2">
-              <span class="text-slate-400 font-mono">✉️ Email:</span>
+              <span class="text-slate-400 font-mono">Email:</span>
               <a href="mailto:us-sales@jc-batteryway.com" class="text-green-600 hover:underline">us-sales@jc-batteryway.com</a>
             </p>
           </div>
@@ -132,130 +131,129 @@ import Header from '../../components/Header.astro'; // 引入品牌绿智能导�
 
       </div>
 
-      <!-- ================== 右边：专业 B2B 定制询盘表单 (lg:col-span-7) ================== -->
+      <!-- ================== Right: Professional B2B Inquiry Form (lg:col-span-7) ================== -->
       <div id="message" class="lg:col-span-7 bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-300 space-y-6">
         <div class="border-b border-slate-100 pb-4">
-          <h2 class="text-xl font-black text-slate-900">在线递交定制留言与大货报价申请</h2>
-          <p class="text-xs text-slate-400 mt-1">请详细填写您的电池技术指标和需求，以便我们的工程师为您核算精确的成本数据。</p>
+          <h2 class="text-xl font-black text-slate-900">Submit Your Inquiry & Quote Request Online</h2>
+          <p class="text-xs text-slate-400 mt-1">Please fill in your battery specifications and requirements in detail so our engineers can calculate precise cost data for you.</p>
         </div>
 
-        <!-- 📬 Web3Forms 真实的免服务器询盘表单接口 -->
+        <!-- Web3Forms Serverless Form API -->
         <form action="https://api.web3forms.com/submit" method="POST" id="inquiry-form" class="space-y-4">
           
-          <!-- ⚠️ 真实密钥已自动注入，一键激活收件功能 -->
           <input type="hidden" name="access_key" value="5a6b61e2-c06f-46aa-abd5-b1c392d8539d" />
-          <input type="hidden" name="subject" value="🔋 嘉程官网收到一笔新储能电池定制询盘" />
+          <input type="hidden" name="subject" value="🔋 JC New Energy Web Inquiry Recieved" />
           <input type="checkbox" name="botcheck" class="hidden" style="display: none;" />
 
-          <!-- 表单网格 -->
+          <!-- Form Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">您的姓名 (Full Name)*</label>
-              <input type="text" name="name" required class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/50" placeholder="例如：工程师 Mr. Muller" />
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Full Name*</label>
+              <input type="text" name="name" required class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/50" placeholder="e.g., Mr. Muller (Engineer)" />
             </div>
             <div>
-              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">企业邮箱 (Work Email)*</label>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Work Email*</label>
               <input type="email" name="email" id="lead-email" required class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/50" placeholder="example@company.com" />
             </div>
             <div>
-              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">公司名称 (Company Name)*</label>
-              <input type="text" name="company" required class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/50" placeholder="例如：JC Storage Ltd." />
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Company Name*</label>
+              <input type="text" name="company" required class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/50" placeholder="e.g., JC Storage Ltd." />
             </div>
             <div>
-              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">国家 / 地区 (Country)*</label>
-              <input type="text" name="country" id="lead-country" required class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/50" placeholder="例如：德国、北美" />
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Country / Region*</label>
+              <input type="text" name="country" id="lead-country" required class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/50" placeholder="e.g., Germany, USA" />
             </div>
           </div>
 
-          <!-- B2B 专业电池指标字段 -->
+          <!-- B2B Battery Spec Fields -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-b border-slate-100 py-4 my-2">
             <div>
-              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">定制电压 (Voltage)</label>
-              <input type="text" name="required_voltage" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/30" placeholder="如：51.2V / 384V" />
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Custom Voltage</label>
+              <input type="text" name="required_voltage" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/30" placeholder="e.g., 51.2V / 384V" />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">定制容量 (Capacity)</label>
-              <input type="text" name="required_capacity" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/30" placeholder="如：100Ah / 280Ah" />
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Custom Capacity</label>
+              <input type="text" name="required_capacity" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/30" placeholder="e.g., 100Ah / 280Ah" />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">首期需求量 (Quantity)</label>
-              <input type="text" name="required_quantity" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/30" placeholder="如：500 组" />
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Initial Order Quantity</label>
+              <input type="text" name="required_quantity" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-green-500 bg-slate-50/30" placeholder="e.g., 500 Packs" />
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">具体定制需求或应用场景 (Detailed Requirements)*</label>
-            <textarea name="message" id="lead-app" required rows="4" class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-green-500 bg-slate-50" placeholder="例如：我们需要将电池用于工商业液冷储能项目，逆变器品牌是固德威，要求带 CAN 协议通讯..."></textarea>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Detailed Requirements & Application Scenarios*</label>
+            <textarea name="message" id="lead-app" required rows="4" class="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-green-500 bg-slate-50" placeholder="e.g., We need batteries for a C&I liquid-cooled ESS project. The inverter brand is GoodWe, and CAN communication protocol is required..."></textarea>
           </div>
 
-          <!-- 提交按钮 (亮丽高对比嘉程绿) -->
+          <!-- Submit Button -->
           <button type="submit" class="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-sm transition-all shadow-md shadow-green-600/15 hover:scale-[1.01] cursor-pointer">
-            提交定制申请 ➔
+            Submit Request ➔
           </button>
         </form>
 
-        <!-- 表单提交成功后的提示 (默认隐藏) -->
+        <!-- Form Success Alert -->
         <div id="form-success-alert" class="hidden p-4 bg-green-50 border border-green-200 rounded-xl text-center text-sm font-bold text-green-800 animate-pulse">
-          🎉 提交成功！您的电池询盘已成功递送。我们的应用工程师会立即开始评估，并在 24 小时内通过邮件联系您。
+          🎉 Submission Successful! Your battery inquiry has been received. Our application engineers will evaluate it immediately and contact you via email within 24 hours.
         </div>
       </div>
 
     </div>
   </main>
 
-  <!-- 3. 页脚 -->
+  <!-- 3. Footer -->
   <footer class="bg-slate-900 text-slate-400 py-16 px-6 border-t border-slate-950 mt-20">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
-      <div>© {new Date().getFullYear()} 嘉程新能源股份公司. All rights reserved.</div>
+      <div>© {new Date().getFullYear()} JC New Energy Co., Ltd. All rights reserved.</div>
       <div class="flex gap-6">
-        <a href="/" class="hover:text-green-600">首页</a>
-        <a href="/products" class="hover:text-green-600">产品中心</a>
-        <a href="/news" class="hover:text-green-600">新闻中心</a>
+        <!-- 👈 修改：全部转换为英文跳转链接并用 resolveUrl 包裹 -->
+        <a href={resolveUrl('/en')} class="hover:text-green-600">Home</a>
+        <a href={resolveUrl('/en/products')} class="hover:text-green-600">Products</a>
+        <a href={resolveUrl('/en/news')} class="hover:text-green-600">News</a>
       </div>
     </div>
   </footer>
 
-  <!-- ----------------- 🚀 原生高性能表单提交拦截与反馈 ----------------- -->
+  <!-- ----------------- 🚀 Form Interception Script ----------------- -->
   <script is:inline>
     const inquiryForm = document.getElementById('inquiry-form');
     const successAlert = document.getElementById('form-success-alert');
 
     inquiryForm?.addEventListener('submit', function(e) {
-      e.preventDefault(); // 拦截默认跳转
+      e.preventDefault(); // Intercept default jump
 
       const submitBtn = inquiryForm.querySelector('button[type="submit"]');
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = "正在递送您的定制需求...";
+        submitBtn.textContent = "Submitting your requirements...";
         submitBtn.style.opacity = "0.7";
       }
 
       const formData = new FormData(inquiryForm);
 
-      // 递交表单数据至 Web3Forms
+      // Submit data to Web3Forms
       fetch(inquiryForm.action, {
         method: 'POST',
         body: formData
       })
       .then(async (response) => {
         if (response.status === 200) {
-          // 发送成功，隐藏表单，显示绿色成功提示
           inquiryForm.style.display = 'none';
           successAlert.classList.remove('hidden');
         } else {
           const json = await response.json();
           console.error(json);
-          alert('递交失败，请检查网络或直接发送邮件至 info@jc-batteryway.com');
+          alert('Submission failed. Please check your network or email us directly at info@jc-batteryway.com');
         }
       })
       .catch(error => {
         console.error(error);
-        alert('网络异常，请稍后重试或通过左侧邮箱直接联络。');
+        alert('Network anomaly. Please try again later or contact us directly via email.');
       })
       .finally(() => {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent = "提交定制申请 ➔";
+          submitBtn.textContent = "Submit Request ➔";
           submitBtn.style.opacity = "1";
         }
       });
