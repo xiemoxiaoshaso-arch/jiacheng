@@ -1,31 +1,38 @@
 ---
-import { getCollection, render } from 'astro:content'; // 👈 新增导入 Astro 5 原生渲染器
+import { getCollection, render } from 'astro:content'; 
+import { Image } from 'astro:assets'; // 👈 Import Astro assets optimizer
 import '../../../styles/global.css';
 import Header from '../../../components/Header.astro';
 
 export async function getStaticPaths() {
   const newsList = await getCollection('news');
-  return newsList.map(news => ({
+  
+  // 👈 Unified: Filter only English news based on Frontmatter lang === 'en'
+  const englishNews = newsList.filter(news => news.data.lang === 'en');
+  
+  return englishNews.map(news => ({
     params: { id: news.id },
     props: { news }
   }));
 }
 
 const { news } = Astro.props;
-const { title, category, categoryName, date, views, image } = news.data;
-const { Content } = await render(news); // 👈 原生极速编译并渲染 md 的所有内容
+const { title, category, categoryName, date, views, image, description } = news.data;
+const { Content } = await render(news); 
 
-// 👈 统一处理链接和公开静态资源路径的辅助函数（自动补全域名根路径前缀）
+// Unified helper function to handle base path prefixes (for subdirectory deployment)
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const resolveUrl = (path: string) => {
   if (path === '/') return base || '/';
   return `${base}${path}`;
 };
 
-// 兼容处理分类名称的国际化显示
-const displayCategory = categoryName === '企业动态' || categoryName === '公司新闻' 
-  ? (category === 'corporate' ? 'Corporate News' : 'Industry Insights') 
-  : categoryName;
+// Localization dictionary for category display names
+const categoryTranslation: Record<string, string> = {
+  'corporate': 'Corporate News',
+  'industry': 'Industry Insights'
+};
+const displayCategory = categoryTranslation[category] || categoryName;
 ---
 
 <html lang="en">
@@ -33,14 +40,18 @@ const displayCategory = categoryName === '企业动态' || categoryName === '公
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title} - JC New Energy</title>
+  {description && <meta name="description" content={description} />}
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
+  <!-- 1. Universal Header Navigation -->
   <Header />
 
+  <!-- 2. Main Content Container -->
   <main class="max-w-4xl mx-auto px-4 py-12">
     
-    <a href={resolveUrl('/news')} class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-green-600 transition-colors mb-6 group uppercase tracking-wider">
+    <!-- 👈 Unified: Adjusted return path to /en/news -->
+    <a href={resolveUrl('/en/news')} class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-green-600 transition-colors mb-6 group uppercase tracking-wider">
       ⬅ Back to News Center
     </a>
 
@@ -64,11 +75,22 @@ const displayCategory = categoryName === '企业动态' || categoryName === '公
         </div>
       </div>
 
-      <div class="w-full aspect-video bg-slate-50 rounded-2xl overflow-hidden border border-slate-100">
-        <img src={image} alt={title} class="w-full h-full object-cover" />
+      <div class="w-full aspect-video bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 relative">
+        <!-- 👈 Improved: Native Image configuration with specific dimensions and responsive width sets to protected against CLS -->
+        <Image 
+          src={image} 
+          alt={title} 
+          width={800}
+          height={450}
+          widths={[400, 800, 1200]}
+          sizes="(max-width: 800px) 100vw, 800px"
+          loading="eager"
+          class="w-full h-full object-cover" 
+        />
       </div>
 
-      <div class="prose max-w-none text-slate-600 text-sm md:text-base leading-relaxed space-y-6">
+      <!-- Optimized Typography for English prose layout -->
+      <div class="prose prose-slate max-w-none prose-p:text-slate-600 prose-p:text-sm md:prose-p:text-base prose-p:leading-relaxed prose-headings:font-bold prose-headings:text-slate-900">
         <Content />
       </div>
 
@@ -77,7 +99,8 @@ const displayCategory = categoryName === '企业动态' || categoryName === '公
           <h4 class="font-bold text-slate-900 text-sm">Follow JC New Energy for the Latest Innovations</h4>
           <p class="text-xs text-slate-400">Stay updated with cutting-edge lithium cell tech, custom battery packs, and global commercial ESS blueprints.</p>
         </div>
-        <a href={resolveUrl('/products')} class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-all shadow-sm shrink-0 whitespace-nowrap uppercase tracking-wider">
+        <!-- 👈 Unified: Adjusted redirect path to /en/products -->
+        <a href={resolveUrl('/en/products')} class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-all shadow-sm shrink-0 whitespace-nowrap uppercase tracking-wider">
           Explore Products ➔
         </a>
       </div>
@@ -85,20 +108,23 @@ const displayCategory = categoryName === '企业动态' || categoryName === '公
     </article>
 
     <div class="text-center mt-12">
-      <a href={resolveUrl('/news')} class="inline-flex px-6 py-3 bg-white border border-slate-200 hover:border-green-600 hover:text-green-600 text-slate-600 text-xs font-bold rounded-xl transition-colors shadow-sm uppercase tracking-wider">
+      <!-- 👈 Unified: Adjusted return path to /en/news -->
+      <a href={resolveUrl('/en/news')} class="inline-flex px-6 py-3 bg-white border border-slate-200 hover:border-green-600 hover:text-green-600 text-slate-600 text-xs font-bold rounded-xl transition-colors shadow-sm uppercase tracking-wider">
         Back to News Center
       </a>
     </div>
 
   </main>
 
+  <!-- 3. English Footer -->
   <footer class="bg-slate-900 text-slate-400 py-12 px-6 border-t border-slate-950 mt-20">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
       <div>© {new Date().getFullYear()} JC New Energy Co., Ltd. All rights reserved.</div>
       <div class="flex gap-6 uppercase tracking-wider font-semibold">
-        <a href={resolveUrl('/')} class="hover:text-green-600">Home</a>
-        <a href={resolveUrl('/products')} class="hover:text-green-600">Products</a>
-        <a href={resolveUrl('/contact')} class="hover:text-green-600">Inquiry</a>
+        <!-- 👈 Unified: Adjusted paths to English directory -->
+        <a href={resolveUrl('/en')} class="hover:text-green-600">Home</a>
+        <a href={resolveUrl('/en/products')} class="hover:text-green-600">Products</a>
+        <a href={resolveUrl('/en/contact')} class="hover:text-green-600">Inquiry</a>
       </div>
     </div>
   </footer>

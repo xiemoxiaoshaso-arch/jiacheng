@@ -1,36 +1,38 @@
 ---
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets'; // 👈 新增：引入 Astro 官方图片组件
-import '../styles/global.css'; // 👈 引入全局 Tailwind 样式
-import Header from '../components/Header.astro'; // 👈 新增引入导航组件
+import { Image } from 'astro:assets'; // 👈 导入 Astro 原生图片优化组件
+import '../styles/global.css'; 
+import Header from '../components/Header.astro'; 
 
-// 👈 新增：统一处理链接的辅助函数（自动补全项目基础路径 /jiacheng）
+// 统一处理链接和公开静态资源路径的辅助函数（兼容子目录部署环境）
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const resolveUrl = (path: string) => {
   if (path === '/') return base || '/';
   return `${base}${path}`;
 };
 
-// 动态拉取产品库中的所有电池（展示在首页的“明星产品”板块中）
+// 1. 读取并精准筛选：基于 Frontmatter 的 lang 字段提取中文产品
 const allProducts = await getCollection('products');
-// 仅挑选前两款作为首页的“明星产品”展示，避免首页过长
-const featuredProducts = allProducts.slice(0, 2);
+const zhProducts = allProducts.filter(product => product.data.lang === 'zh');
+
+// 2. 挑选前两款作为首页的“明星产品”展示
+const featuredProducts = zhProducts.slice(0, 2);
 ---
 
-<html lang="zh">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>嘉程新能源 | 全球领先的锂电池及储能系统解决方案提供商</title>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-slate-50 text-slate-800 antialiased font-sans">
 
   <!-- 1. 顶部导航栏 -->
   <Header /> 
 
-  <!-- 2. 首屏科技感宣誓 (Hero Section) -->
+  <!-- 2. 首屏 Hero 区域 -->
   <section class="relative bg-slate-900 text-white py-24 md:py-32 overflow-hidden">
-    <!-- 渐变光，营造高端新能源科技感 -->
+    <!-- 渐变底色，呼应新能源科技调性 -->
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.15),transparent_50%)]"></div>
     
     <div class="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -46,21 +48,19 @@ const featuredProducts = allProducts.slice(0, 2);
           我们专注于高安全、长寿命磷酸铁锂（LFP）电芯研发与储能系统集成，年产能规划 15 GWh，为全球客户提供一站式定制化动力与储能包方案。
         </p>
         <div class="flex flex-col sm:flex-row gap-4 pt-4">
-          <!-- 👈 修改：使用 resolveUrl 包装链接 -->
           <a href={resolveUrl('/products')} class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-center font-bold rounded-lg shadow-lg transition-colors">
             浏览产品中心 ➔
           </a>
-          <!-- 👈 修改：使用 resolveUrl 包装链接 -->
           <a href={resolveUrl('/contact')} class="px-8 py-4 border border-slate-500 hover:border-white text-center font-bold rounded-lg transition-colors">
             获取大货报价
           </a>
         </div>
       </div>
       
-      <!-- 右侧：玻璃智能监控面板 -->
+      <!-- 右侧：实时数据监控模拟面板 -->
       <div class="lg:col-span-5 flex justify-center">
         <div class="w-full max-w-md bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-800 p-6 shadow-[0_15px_35px_rgba(16,185,129,0.15)] relative">
-          <!-- 顶部状态栏与呼吸灯 -->
+          <!-- 顶部状态栏与状态呼吸灯 -->
           <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-4">
             <div class="flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
@@ -69,7 +69,7 @@ const featuredProducts = allProducts.slice(0, 2);
             <span class="text-[10px] text-slate-500 font-mono">ID: LFP_CELL_280AH</span>
           </div>
 
-          <!-- 仿真监测指标网格 -->
+          <!-- 实时监测数据指标 -->
           <div class="grid grid-cols-2 gap-4">
             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
               <div class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">电芯工作电压</div>
@@ -99,7 +99,7 @@ const featuredProducts = allProducts.slice(0, 2);
     </div>
   </section>
 
-  <!-- 3. 核心实力数据 (Key Stats) -->
+  <!-- 3. 核心实力数据统计 -->
   <section class="max-w-7xl mx-auto px-6 -mt-12 relative z-20">
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
@@ -121,23 +121,22 @@ const featuredProducts = allProducts.slice(0, 2);
     </div>
   </section>
 
-  <!-- 4. 动态明星产品板块 (Featured Products) -->
+  <!-- 4. 推荐明星产品板块 (Featured Products) -->
   <section class="max-w-7xl mx-auto px-6 py-20 bg-slate-100/50 rounded-3xl my-12 border border-slate-200/40">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
       <div>
         <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase">Star Products</span>
         <h2 class="text-3xl font-extrabold text-slate-900 mt-2">推荐明星产品</h2>
-        <p class="text-slate-500 mt-2 text-sm max-w-lg">
+        <p class="text-slate-500 mt-2 text-sm max-w-lg font-sans">
           精选高能量密度电芯与高兼容性储能电池包，提供汽车级（Automotive-Grade）极端工况品质保障。
         </p>
       </div>
-      <!-- 👈 修改：使用 resolveUrl 包装链接 -->
       <a href={resolveUrl('/products')} class="mt-4 md:mt-0 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-2">
         前往产品中心（所有型号） ➔
       </a>
     </div>
 
-    <!-- 这里将动态循环渲染前两款产品卡片 -->
+    <!-- 动态循环渲染推荐产品卡片 -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       {featuredProducts.map(product => (
         <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
@@ -150,27 +149,34 @@ const featuredProducts = allProducts.slice(0, 2);
             </div>
             
             <div class="h-56 w-full bg-slate-50 rounded-xl flex items-center justify-center p-6 mb-6 border border-slate-100">
-              <!-- 👈 修改：使用 Astro 官方的 <Image /> 组件，并直接把 product.data.image 传给 src -->
-              <Image src={product.data.image} alt={product.data.title} class="max-h-full object-contain" />
+              <!-- 👈 修改：优化原生 Image 配置，提供高宽规格，提高累积布局偏移（CLS）防护等级 -->
+              <Image 
+                src={product.data.image} 
+                alt={product.data.title} 
+                width={350}
+                height={220}
+                widths={[200, 350]}
+                sizes="(max-width: 768px) 100vw, 350px"
+                class="max-h-full object-contain" 
+              />
             </div>
 
             <h3 class="text-2xl font-bold text-slate-900 mb-3">{product.data.title}</h3>
             
-            <!-- 指标精简摘要 -->
+            <!-- 指标摘要 -->
             <div class="grid grid-cols-2 gap-4 text-sm border-t border-slate-100 pt-4 mt-4">
               <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                <div class="text-xs text-slate-400">容量指标</div>
-                <div class="font-bold text-slate-800 mt-1">{product.data.specs.find(s => s.name.includes('容量'))?.value || '详见参数表'}</div>
+                <div class="text-xs text-slate-400 font-sans">容量指标</div>
+                <div class="font-bold text-slate-800 mt-1 font-sans">{product.data.specs.find((s: any) => s.name.includes('容量'))?.value || '详见参数表'}</div>
               </div>
               <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                <div class="text-xs text-slate-400">标称电压</div>
-                <div class="font-bold text-slate-800 mt-1">{product.data.specs.find(s => s.name.includes('电压'))?.value || '详见参数表'}</div>
+                <div class="text-xs text-slate-400 font-sans">标称电压</div>
+                <div class="font-bold text-slate-800 mt-1 font-sans">{product.data.specs.find((s: any) => s.name.includes('电压'))?.value || '详见参数表'}</div>
               </div>
             </div>
           </div>
 
           <div class="px-8 pb-8 bg-white">
-            <!-- 👈 修改：跳转链接同样使用 resolveUrl 包装 -->
             <a href={resolveUrl(`/products/${product.id}`)} class="block w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-center text-sm font-bold rounded-xl shadow-sm transition-colors">
               查看核心技术参数表 ➔
             </a>
@@ -185,10 +191,10 @@ const featuredProducts = allProducts.slice(0, 2);
     <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
       <div class="lg:col-span-6 space-y-6">
         <h2 class="text-3xl font-extrabold tracking-tight">以汽车级（Automotive-grade）标准管控品质</h2>
-        <p class="text-slate-300 leading-relaxed">
+        <p class="text-slate-300 leading-relaxed font-sans">
           电池的品质决定了整个系统的安全。我们导入了严苛的质量控制网络，并在全工序全面部署全自动化追溯系统（MES）。
         </p>
-        <ul class="space-y-3 text-slate-400 text-sm">
+        <ul class="space-y-3 text-slate-400 text-sm font-sans">
           <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 荣获 <strong>IATF 16949</strong> 汽车级管理体系认证</li>
           <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 全自动无人洁净车间（万级无尘，控制水氧参数）</li>
           <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 电芯出厂进行 100% X-ray、充放电及超声波无损探伤检测</li>
@@ -216,17 +222,16 @@ const featuredProducts = allProducts.slice(0, 2);
     </div>
   </section>
 
-  <!-- 6. 页脚 (Footer) -->
+  <!-- 6. 页脚 -->
   <footer class="bg-slate-950 text-slate-500 py-12 px-6 border-t border-slate-900">
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
       <div class="space-y-4">
-        <div class="text-white font-bold text-lg flex items-center gap-2">🔋 新能源科技</div>
-        <p class="text-xs leading-relaxed">致力于以高安全、绿色、高效率的电池技术，服务于全球绿色零碳经济和能源转型转型战略。</p>
+        <div class="text-white font-bold text-lg flex items-center gap-2">🔋 嘉程新能源</div>
+        <p class="text-xs leading-relaxed font-sans">致力于以高安全、绿色、高效率的电池技术，服务于全球绿色零碳经济和能源转型转型战略。</p>
       </div>
       <div>
         <h4 class="text-white font-bold text-sm mb-4">产品中心</h4>
         <ul class="space-y-2 text-xs">
-          <!-- 👈 修改：页脚里的三个产品跳转同样需要用 resolveUrl 包裹 -->
           <li><a href={resolveUrl('/products')} class="hover:text-white transition-colors">储能系列</a></li>
           <li><a href={resolveUrl('/products')} class="hover:text-white transition-colors">动力系列</a></li>
           <li><a href={resolveUrl('/products')} class="hover:text-white transition-colors">工业电池组</a></li>
@@ -234,7 +239,7 @@ const featuredProducts = allProducts.slice(0, 2);
       </div>
       <div>
         <h4 class="text-white font-bold text-sm mb-4">质量与认证</h4>
-        <ul class="space-y-2 text-xs">
+        <ul class="space-y-2 text-xs font-sans">
           <li>IATF 16949 汽车体系</li>
           <li>ISO 9001 / 14001</li>
           <li>UL1973 / IEC62619 / UN38.3</li>
@@ -242,11 +247,11 @@ const featuredProducts = allProducts.slice(0, 2);
       </div>
       <div>
         <h4 class="text-white font-bold text-sm mb-4">企业总部</h4>
-        <p class="text-xs leading-relaxed">中国·国家级高新技术产业园区新能源路 88 号<br />Tel: +86 (512) 8888-8888<br />Email: info@yourcompany.com</p>
+        <p class="text-xs leading-relaxed font-sans">中国·国家级高新技术产业园区新能源路 88 号<br />Tel: +86 (512) 8888-8888<br />Email: info@jc-batteryway.com</p>
       </div>
     </div>
-    <div class="max-w-7xl mx-auto border-t border-slate-900 pt-8 flex flex-col md:flex-row justify-between items-center text-xs">
-      <div>© {new Date().getFullYear()} 新能源科技股份公司. All rights reserved.</div>
+    <div class="max-w-7xl mx-auto border-t border-slate-900 pt-8 flex flex-col md:flex-row justify-between items-center text-xs font-sans">
+      <div>© {new Date().getFullYear()} 嘉程新能源股份公司. All rights reserved.</div>
       <div class="flex gap-4 mt-4 md:mt-0">
         <a href="#" class="hover:text-white transition-colors">隐私政策</a>
         <a href="#" class="hover:text-white transition-colors">ICP备xxxxxx号</a>
@@ -256,22 +261,22 @@ const featuredProducts = allProducts.slice(0, 2);
 
 </body>
 
-<!-- ----------------- 🚀 高性能数据波动脚本 ----------------- -->
-  <script is:inline>
-    const vEl = document.getElementById('live-voltage');
-    const tEl = document.getElementById('live-temp');
-    
-    if (vEl && tEl) {
-      setInterval(() => {
-        // 让电压在 3.280V ~ 3.288V 之间高频波动
-        const fakeVoltage = (3.280 + Math.random() * 0.008).toFixed(3);
-        vEl.textContent = `${fakeVoltage} V`;
-        
-        // 让温度在 25.1℃ ~ 25.5℃ 之间平滑微动
-        const fakeTemp = (25.1 + Math.random() * 0.4).toFixed(1);
-        tEl.textContent = `${fakeTemp} ℃`;
-      }, 2000); // 每 2 秒微动一次
-    }
-  </script>
+<!-- 监控面板数据模拟波动脚本 -->
+<script is:inline>
+  const vEl = document.getElementById('live-voltage');
+  const tEl = document.getElementById('live-temp');
+  
+  if (vEl && tEl) {
+    setInterval(() => {
+      // 电压在 3.280V ~ 3.288V 之间高频波动
+      const fakeVoltage = (3.280 + Math.random() * 0.008).toFixed(3);
+      vEl.textContent = `${fakeVoltage} V`;
+      
+      // 温度在 25.1℃ ~ 25.5℃ 之间平滑微动
+      const fakeTemp = (25.1 + Math.random() * 0.4).toFixed(1);
+      tEl.textContent = `${fakeTemp} ℃`;
+    }, 2000);
+  }
+</script>
 
 </html>

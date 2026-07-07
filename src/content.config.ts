@@ -45,7 +45,8 @@ const careersCollection = defineCollection({
     experience: z.string(),
     responsibilities: z.array(z.string()), 
     requirements: z.array(z.string()),     
-    sortOrder: z.number().optional(),      
+    sortOrder: z.number().optional(), 
+    lang: z.enum(['zh', 'en']).optional(),      
   }),
 });
 

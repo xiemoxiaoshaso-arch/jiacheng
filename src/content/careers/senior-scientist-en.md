@@ -1,5 +1,6 @@
 ---
 title: "Lithium-Ion Battery R&D Senior Scientist (LFP/Solid-State Direction)"
+lang: "en"
 department: "Technical R&D Center"
 location: "China Headquarters · R&D Center"
 type: "Full-time"

@@ -1,5 +1,6 @@
 ---
 title: "LFP 280Ah Energy Storage Cell"
+lang: "en"
 category: "Cells"
 chemistry: "Lithium Iron Phosphate (LFP)"
 image: "../../assets/images/cell-280ah-1.png"

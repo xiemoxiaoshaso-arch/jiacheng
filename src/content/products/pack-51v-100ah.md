@@ -1,5 +1,6 @@
 ---
 title: "51.2V 100Ah 机架式储能电池包"
+lang: "zh" 
 category: "电池包 (Pack)"
 chemistry: "磷酸铁锂 (LFP)"
 image: "../../assets/images/pack-51v-100ah.jpg"

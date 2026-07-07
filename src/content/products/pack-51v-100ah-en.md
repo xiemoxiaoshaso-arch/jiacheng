@@ -1,5 +1,6 @@
 ---
 title: "51.2V 100Ah Rack-Mounted Energy Storage Battery Pack"
+lang: "en"
 category: "Pack"
 chemistry: "Lithium Iron Phosphate (LFP)"
 image: "../../assets/images/pack-51v-100ah.jpg"

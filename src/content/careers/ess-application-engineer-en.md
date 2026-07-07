@@ -1,5 +1,6 @@
 ---
 title: "Commercial & Industrial ESS Application Engineer"
+lang: "en"
 department: "Overseas After-Sales Support Dept."
 location: "Frankfurt, Germany / California Office, USA"
 type: "Full-time"

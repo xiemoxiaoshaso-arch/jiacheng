@@ -1,5 +1,6 @@
 ---
 title: "LFP 280Ah 储能电芯"
+lang: "zh" 
 category: "电芯 (Cells)"
 chemistry: "磷酸铁锂 (LFP)"
 image: "../../assets/images/cell-280ah-1.png"   # 👈 已修改：改为相对路径以完美通过 image() 校验

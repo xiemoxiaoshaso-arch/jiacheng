@@ -1,5 +1,6 @@
 ---
 title: "车规级电芯制造 MES 系统工程师"
+lang: "zh" 
 department: "智能智造中心"
 location: "中国总部·智能工厂"
 type: "全职"

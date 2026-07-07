@@ -1,5 +1,6 @@
 ---
 title: "Automotive-Grade Battery Manufacturing MES System Engineer"
+lang: "en"
 department: "Smart Manufacturing Center"
 location: "China Headquarters · Smart Factory"
 type: "Full-time"

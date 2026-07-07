@@ -1,48 +1,57 @@
 ---
-import { getCollection } from 'astro:content'; // 👈 导入内容层读取函数
+import { getCollection } from 'astro:content'; 
+import { Image } from 'astro:assets'; // 👈 导入 Astro 原生图片优化组件
 import '../styles/global.css';
 import Header from '../components/Header.astro'; 
 
-// 👈 新增：统一处理链接和公开静态资源路径的辅助函数（自动补全 /jiacheng 前缀）
+// 统一处理路径和链接补全的辅助函数
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const resolveUrl = (path: string) => {
   if (path === '/') return base || '/';
   return `${base}${path}`;
 };
 
-// 1. 动态拉取 src/content/careers 文件夹下的所有岗位 md 文件
+// 👈 推荐做法：将 Banner 图片放入 src/assets 目录下，享受全自动无损压缩与自适应高宽处理
+import careersBanner from '../assets/images/careers-banner.jpg'; 
+
+// 1. 读取招聘岗位数据集
 const rawJobs = await getCollection('careers');
 
-// 2. 💡 黄金逻辑：按 sortOrder 权重数字进行升序排序，数值越小越靠前，未设定的排到最后
-const jobsList = rawJobs.sort((a, b) => {
+// 2. 精准筛选：基于 Frontmatter 的 lang 字段，确保仅提取中文版（lang === 'zh'）的招聘数据
+const zhJobs = rawJobs.filter(job => job.data.lang === 'zh');
+
+// 3. 排序逻辑：按 sortOrder 权重数字进行升序排序，数值越小越靠前，未设定的排到最后
+const jobsList = zhJobs.sort((a, b) => {
   const orderA = a.data.sortOrder !== undefined ? a.data.sortOrder : 99;
   const orderB = b.data.sortOrder !== undefined ? b.data.sortOrder : 99;
   return orderA - orderB;
 });
 ---
 
-<html lang="zh">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>招贤纳士 - 嘉程新能源</title>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
   <!-- 1. 通用智能导航栏 -->
   <Header />
 
-  <!-- 2. 招贤纳士大图 Banner -->
+  <!-- 2. 招贤纳士 Banner 区域 -->
   <section class="relative w-full h-[300px] md:h-[400px] overflow-hidden flex items-center justify-center bg-slate-950 border-b border-slate-200/60">
-    <!-- 背景大图 (使用 resolveUrl 包裹，消除双斜杠隐患) -->
-    <img 
-      src={resolveUrl('/images/careers-banner.jpg')}
+    <!-- 👈 修改：改用原生 Image 组件，减少首屏 LCP 延迟并自适应不同分辨率设备 -->
+    <Image 
+      src={careersBanner}
       alt="嘉程招贤纳士" 
+      widths={[600, 1200, 1800]}
+      sizes="100vw"
+      loading="eager"
       class="absolute inset-0 w-full h-full object-cover opacity-95 hover:scale-[1.02] transition-transform duration-[10000ms] ease-out"
     />
     <div class="absolute inset-0 bg-slate-950/35 pointer-events-none"></div>
     <div class="absolute inset-0 bg-gradient-to-tr from-green-500/10 via-transparent to-blue-500/10 pointer-events-none"></div>
-    <!-- 调整为极淡、极矮的渐变（高度缩减至 40px，最大不透明度仅为 30%，彻底消融死白带） -->
     <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/30 to-transparent pointer-events-none"></div>
 
     <div class="relative z-10 max-w-5xl mx-auto text-center px-6 space-y-4">
@@ -58,10 +67,10 @@ const jobsList = rawJobs.sort((a, b) => {
     </div>
   </section>
 
-  <!-- 3. 企业福利与文化块 -->
+  <!-- 3. 企业福利与文化块（预留） -->
   
 
-  <!-- 4. 动态自适应职位网格 (从 md 数据文件中智能循环并高标准渲染) -->
+  <!-- 4. 职位列表网格 -->
   <section class="w-full bg-slate-100 pt-8 pb-16 border-b border-slate-200 reveal-section opacity-0 translate-y-8 transition-all duration-1000">
     <div class="max-w-4xl mx-auto px-6 space-y-8">
       <div class="text-center">
@@ -75,7 +84,7 @@ const jobsList = rawJobs.sort((a, b) => {
         {jobsList.map(job => (
           <div class="bg-white rounded-2xl border border-slate-300 p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow space-y-6">
             
-            <!-- 大厂一体化自然流头部 -->
+            <!-- 头部基本信息 -->
             <div class="border-b border-slate-100 pb-5">
               <div class="flex flex-wrap items-center gap-2.5">
                 <h3 class="text-lg md:text-xl font-black text-slate-900 leading-snug">{job.data.title}</h3>
@@ -106,7 +115,7 @@ const jobsList = rawJobs.sort((a, b) => {
                   <span class="w-1.5 h-3 bg-green-600 rounded-sm"></span> 岗位职责
                 </h4>
                 <ul class="list-disc pl-4 text-slate-500 space-y-1">
-                  {job.data.responsibilities.map(resp => <li>{resp}</li>)}
+                  {job.data.responsibilities.map((resp: string) => <li>{resp}</li>)}
                 </ul>
               </div>
               <div class="space-y-2">
@@ -114,7 +123,7 @@ const jobsList = rawJobs.sort((a, b) => {
                   <span class="w-1.5 h-3 bg-green-600 rounded-sm"></span> 任职要求
                 </h4>
                 <ul class="list-disc pl-4 text-slate-500 space-y-1">
-                  {job.data.requirements.map(req => <li>{req}</li>)}
+                  {job.data.requirements.map((req: string) => <li>{req}</li>)}
                 </ul>
               </div>
             </div>
@@ -124,17 +133,17 @@ const jobsList = rawJobs.sort((a, b) => {
     </div>
   </section>
 
-  <!-- 5. 简历一键极速投递 -->
+  <!-- 5. 简历投递通道 -->
   <section class="w-full bg-white py-20 reveal-section opacity-0 translate-y-8 transition-all duration-1000">
     <div class="max-w-4xl mx-auto px-6 text-center space-y-6">
       <div class="w-14 h-14 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-2xl mx-auto shadow-sm">✉️</div>
-      <h2 class="text-3xl font-extrabold text-slate-900">简历一键极速投递</h2>
+      <h2 class="text-3xl font-extrabold text-slate-900">简历投递通道</h2>
       <p class="text-slate-500 text-xs md:text-sm max-w-xl mx-auto leading-relaxed">
-        如果您以上热招岗位中没有找到完美契合您方向的职位，但您确信自己拥有能服务于嘉程新能源的核心技术或出海拓展能力，请直接发送自荐信和简历至我们的 HR 团队：
+        如果您在以上热招岗位中没有找到完全契合您方向的职位，但您确信自己拥有能服务于嘉程新能源的核心技术或出海拓展能力，请直接发送自荐信和简历至我们的 HR 团队：
       </p>
       
       <div class="inline-block bg-slate-50 border border-slate-200 px-8 py-4 rounded-2xl">
-        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">简历唯一投递邮箱 (Recruitment Email)</div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">简历投递邮箱 (Recruitment Email)</div>
         <a href="mailto:hr@jc-batteryway.com" class="text-xl md:text-2xl font-black text-green-600 hover:text-green-700 hover:underline mt-1 block tracking-wide font-mono">
           hr@jc-batteryway.com
         </a>
@@ -148,7 +157,6 @@ const jobsList = rawJobs.sort((a, b) => {
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
       <div>© {new Date().getFullYear()} 嘉程新能源股份公司. All rights reserved.</div>
       <div class="flex gap-6">
-        <!-- 👈 修改：页脚这三个跳转链接使用 resolveUrl 动态包装 -->
         <a href={resolveUrl('/')} class="hover:text-green-600">首页</a>
         <a href={resolveUrl('/products')} class="hover:text-green-600">产品中心</a>
         <a href={resolveUrl('/contact')} class="hover:text-green-600">在线留言</a>
@@ -156,7 +164,7 @@ const jobsList = rawJobs.sort((a, b) => {
     </div>
   </footer>
 
-  <!-- ----------------- 🚀 高性能滚动渐入脚本 ----------------- -->
+  <!-- 滚动渐入控制脚本 -->
   <script is:inline>
     const revealObserver = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {

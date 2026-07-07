@@ -1,45 +1,48 @@
 ---
+import { Image } from 'astro:assets'; // 👈 导入 Astro 原生图片优化组件
 import '../styles/global.css';
-import Header from '../components/Header.astro'; // 👈 引入通用智能导航组件
+import Header from '../components/Header.astro'; 
 
-// 👈 新增：统一处理链接和公开静态资源路径的辅助函数（自动补全 /jiacheng 前缀）
+// 统一处理链接和公开静态资源路径的辅助函数（兼容子目录部署环境）
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const resolveUrl = (path: string) => {
   if (path === '/') return base || '/';
   return `${base}${path}`;
 };
+
+// 👈 推荐做法：将 Banner 图片放入 src/assets 目录下，享受原生全自动无损压缩与分辨率自适应
+import aboutBanner from '../assets/images/about-banner.jpg'; 
 ---
 
-<html lang="zh">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>公司简介 - 新能源科技股份公司</title>
+  <title>公司简介 - 嘉程新能源股份公司</title>
 </head>
-<body class="bg-white text-slate-800 font-sans">
+<body class="bg-white text-slate-800 font-sans antialiased">
 
-  <!-- 1. 引入通用智能导航栏 -->
+  <!-- 1. 顶部导航栏 -->
   <Header />
 
-  <!-- 2. 🌟 公司简介巨幕 Banner (使用 resolveUrl 包装，消除双斜杠隐患) -->
+  <!-- 2. 关于我们 Banner 区域 -->
   <section class="relative w-full h-[300px] md:h-[400px] overflow-hidden flex items-center justify-center bg-slate-950 border-b border-slate-200/60">
-    <!-- 背景大图 -->
-    <img 
-      src={resolveUrl('/images/about-banner.jpg')}
+    <!-- 👈 修改：改用原生 Image 组件，保障 Banner 的首屏加载与渲染性能 -->
+    <Image 
+      src={aboutBanner}
       alt="嘉程新能源智造基地" 
+      widths={[600, 1200, 1800]}
+      sizes="100vw"
+      loading="eager"
       class="absolute inset-0 w-full h-full object-cover opacity-95 hover:scale-[1.02] transition-transform duration-[10000ms] ease-out"
     />
     
-    <!-- 电影级暗色偏光罩 -->
+    <!-- 背景遮罩与渐变滤镜，增强文字视觉可读性 -->
     <div class="absolute inset-0 bg-slate-950/35 pointer-events-none"></div>
-    
-    <!-- 极淡绿蓝微光层 -->
     <div class="absolute inset-0 bg-gradient-to-tr from-green-500/10 via-transparent to-blue-500/10 pointer-events-none"></div>
-    
-    <!-- 底部渐变白色罩 -->
     <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/30 to-transparent pointer-events-none"></div>
 
-    <!-- Banner 内部文字 -->
+    <!-- Banner 文本 -->
     <div class="relative z-10 max-w-5xl mx-auto text-center px-6 space-y-4">
       <span class="inline-block px-3 py-1 bg-green-500/20 text-green-300 text-[10px] font-bold tracking-widest uppercase rounded-full border border-green-500/30 animate-pulse">
         关于我们 // ABOUT US
@@ -56,8 +59,8 @@ const resolveUrl = (path: string) => {
   <!-- 3. 企业简介正文过渡区 -->
   <section class="w-full bg-white py-16 border-b border-slate-100">
     <div class="max-w-4xl mx-auto text-center px-6">
-      <p class="text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
-        新能源科技股份公司是一家国家级高新技术企业。自创立以来，我们致力于高安全、高能量密度磷酸铁锂（LFP）及三元锂电芯、模组、Pack 的研发、制造与全球交付。
+      <p class="text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl mx-auto font-sans">
+        嘉程新能源股份公司是一家国家级高新技术企业。自创立以来，我们致力于高安全、高能量密度磷酸铁锂（LFP）及三元锂电芯、模组、Pack 的研发、制造与全球交付。
       </p>
     </div>
   </section>
@@ -69,26 +72,26 @@ const resolveUrl = (path: string) => {
         
         <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
           <div class="text-3xl font-extrabold text-emerald-600 font-mono">150,000 ㎡</div>
-          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider">智造基地占地面积</div>
-          <p class="text-xs text-slate-500 mt-2 leading-relaxed">拥有高度自动化、万级洁净度的现代化绿色生产车间。</p>
+          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">智造基地占地面积</div>
+          <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">拥有高度自动化、万级洁净度的现代化绿色生产车间。</p>
         </div>
 
         <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
           <div class="text-3xl font-extrabold text-emerald-600 font-mono">15 GWh</div>
-          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider">规划产能规模</div>
-          <p class="text-xs text-slate-500 mt-2 leading-relaxed">全面导入工业4.0设备与智能化MES制造全流程追溯系统。</p>
+          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">规划产能规模</div>
+          <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">全面导入工业4.0设备与智能化MES制造全流程追溯系统。</p>
         </div>
 
         <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
           <div class="text-3xl font-extrabold text-emerald-600 font-mono">200+ 人</div>
-          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider">核心研发与技术团队</div>
-          <p class="text-xs text-slate-500 mt-2 leading-relaxed">核心技术团队来自业内顶尖科研院所，自主攻克多项核心技术。</p>
+          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">核心研发与技术团队</div>
+          <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">核心技术团队来自业内顶尖科研院所，自主攻克多项核心技术。</p>
         </div>
 
         <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
           <div class="text-3xl font-extrabold text-emerald-600 font-mono">180+ 项</div>
-          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider">发明与实用专利</div>
-          <p class="text-xs text-slate-500 mt-2 leading-relaxed">在材料改性、极片涂布、BMS智控等领域拥有核心知识产权。</p>
+          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">发明与实用专利</div>
+          <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">在材料改性、极片涂布、BMS智控等领域拥有核心知识产权。</p>
         </div>
 
       </div>
@@ -100,7 +103,7 @@ const resolveUrl = (path: string) => {
     <div class="absolute -top-12 -left-12 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
     <div class="max-w-3xl mx-auto px-6 relative z-10">
-      <div class="text-center mb-16">
+      <div class="text-center mb-16 animate-fade-in">
         <span class="text-xs font-bold text-emerald-400 tracking-wider uppercase font-mono">Our Footsteps</span>
         <h2 class="text-3xl font-extrabold text-white mt-2">发展历程</h2>
         <p class="text-slate-400 mt-2 text-sm">每一步跨越，都沉淀了我们对品质与技术的极致追求</p>
@@ -110,12 +113,12 @@ const resolveUrl = (path: string) => {
         
         <!-- 里程碑 2026 -->
         <div class="relative mb-12 group">
-          <span class="absolute -left-[41px] top-6 w-6 h-6 rounded-full bg-white border-4 border-emerald-500 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform"></span>
+          <span class="absolute -left-[41px] top-6 w-6 h-6 rounded-full bg-white border-4 border-emerald-500 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform" aria-hidden="true"></span>
           
           <div class="bg-slate-50/95 p-6 rounded-2xl border border-slate-200 hover:border-emerald-500/30 shadow-[0_15px_30px_rgba(0,0,0,0.22)] hover:shadow-[0_18px_35px_rgba(16,185,129,0.12)] transition-all">
             <div class="text-lg font-extrabold text-slate-900 font-mono">2026 年</div>
-            <h3 class="text-sm font-bold text-emerald-600 mt-0.5">全球出海与产能跃升</h3>
-            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+            <h3 class="text-sm font-bold text-emerald-600 mt-0.5 font-sans">全球出海与产能跃升</h3>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">
               公司二期 10 GWh 智慧储能电芯生产线顺利投产。同时在欧洲、北美设立本地化仓储和技术支持中心，产品出口覆盖全球 50 多个国家与地区。
             </p>
           </div>
@@ -123,12 +126,12 @@ const resolveUrl = (path: string) => {
 
         <!-- 里程碑 2024 -->
         <div class="relative mb-12 group">
-          <span class="absolute -left-[41px] top-6 w-6 h-6 rounded-full bg-white border-4 border-emerald-500 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform"></span>
+          <span class="absolute -left-[41px] top-6 w-6 h-6 rounded-full bg-white border-4 border-emerald-500 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform" aria-hidden="true"></span>
           
           <div class="bg-slate-50/95 p-6 rounded-2xl border border-slate-200 hover:border-emerald-500/30 shadow-[0_15px_30px_rgba(0,0,0,0.22)] hover:shadow-[0_18px_35px_rgba(16,185,129,0.12)] transition-all">
             <div class="text-lg font-extrabold text-slate-900 font-mono">2024 年</div>
-            <h3 class="text-sm font-bold text-emerald-600 mt-0.5">汽车级认证与批量交付</h3>
-            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+            <h3 class="text-sm font-bold text-emerald-600 mt-0.5 font-sans">汽车级认证与批量交付</h3>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">
               通过严苛的 <strong>IATF 16949</strong> 汽车质量管理体系认证。储能系列电池包与动力电芯开始向国内及海外一线系统集成商大规模批量交付。
             </p>
           </div>
@@ -136,26 +139,26 @@ const resolveUrl = (path: string) => {
 
         <!-- 里程碑 2022 -->
         <div class="relative mb-12 group">
-          <span class="absolute -left-[41px] top-6 w-6 h-6 rounded-full bg-white border-4 border-emerald-500 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform"></span>
+          <span class="absolute -left-[41px] top-6 w-6 h-6 rounded-full bg-white border-4 border-emerald-500 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform" aria-hidden="true"></span>
           
           <div class="bg-slate-50/95 p-6 rounded-2xl border border-slate-200 hover:border-emerald-500/30 shadow-[0_15px_30px_rgba(0,0,0,0.22)] hover:shadow-[0_18px_35px_rgba(16,185,129,0.12)] transition-all">
             <div class="text-lg font-extrabold text-slate-900 font-mono">2022 年</div>
-            <h3 class="text-sm font-bold text-emerald-600 mt-0.5">一期量产与实验室落成</h3>
-            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+            <h3 class="text-sm font-bold text-emerald-600 mt-0.5 font-sans">一期量产与实验室落成</h3>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">
               公司一期 LFP 280Ah 储能电芯生产线正式投产。国家级标准联合实验室（CNAS）完成建设，配置全套充放电及超声波无损检测系统。
             </p>
           </div>
         </div>
 
-        <!-- 里程碑 2020 -->
+        <!-- 里里程碑 2020 -->
         <div class="relative group">
-          <span class="absolute -left-[41px] top-6 w-6 h-6 rounded-full bg-white border-4 border-emerald-500 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform"></span>
+          <span class="absolute -left-[41px] top-6 w-6 h-6 rounded-full bg-white border-4 border-emerald-500 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform" aria-hidden="true"></span>
           
           <div class="bg-slate-50/95 p-6 rounded-2xl border border-slate-200 hover:border-emerald-500/30 shadow-[0_15px_30px_rgba(0,0,0,0.22)] hover:shadow-[0_18px_35px_rgba(16,185,129,0.12)] transition-all">
             <div class="text-lg font-extrabold text-slate-900 font-mono">2020 年</div>
-            <h3 class="text-sm font-bold text-emerald-600 mt-0.5">科技初创与材料攻坚</h3>
-            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
-              新能源科技正式创立，总部及研发中心落成。核心研发团队攻克高循环磷酸铁锂材料改性技术，奠定高安全、长循环的技术根基。
+            <h3 class="text-sm font-bold text-emerald-600 mt-0.5 font-sans">科技初创与材料攻坚</h3>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">
+              嘉程新能源正式创立，总部及研发中心落成。核心研发团队攻克高循环磷酸铁锂材料改性技术，奠定高安全、长循环的技术根基。
             </p>
           </div>
         </div>
@@ -177,7 +180,7 @@ const resolveUrl = (path: string) => {
         <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm hover:border-emerald-500/40 hover:shadow-md transition-all">
           <div class="text-lg font-bold text-slate-900">🇨🇳 中国·智造与研发总部</div>
           <p class="text-[10px] text-slate-400 mt-1">Headquarters & Production</p>
-          <p class="text-xs text-slate-500 mt-4 leading-relaxed">
+          <p class="text-xs text-slate-500 mt-4 leading-relaxed font-sans">
             坐落于国家级高新技术产业园区。承载集团全套智能化生产车间、CNAS 联合实验室、BMS 软硬件工程中心以及主要的产能调度与供应链中心。
           </p>
         </div>
@@ -185,15 +188,15 @@ const resolveUrl = (path: string) => {
         <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm hover:border-emerald-500/40 hover:shadow-md transition-all">
           <div class="text-lg font-bold text-slate-900">🇩🇪 德国·欧洲服务与仓储中心</div>
           <p class="text-[10px] text-slate-400 mt-1">Europe Sales & Technical Center</p>
-          <p class="text-xs text-slate-500 mt-4 leading-relaxed">
-            设立于德国法兰克福。为欧洲本地客户（如工商业储能集成商、微电网工程公司）提供本地化仓储、备件配送、以及极其及时的工程技术售后支持。
+          <p class="text-xs text-slate-500 mt-4 leading-relaxed font-sans">
+            设立于德国法兰克福。为欧洲本地客户（如工商业储能集成商、微电网工程公司）提供本地化仓储、备件配送、以及及时的工程技术售后支持。
           </p>
         </div>
 
         <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm hover:border-emerald-500/40 hover:shadow-md transition-all">
           <div class="text-lg font-bold text-slate-900">🇺🇸 美国·北美商务办事处</div>
           <p class="text-[10px] text-slate-400 mt-1">North America Office</p>
-          <p class="text-xs text-slate-500 mt-4 leading-relaxed">
+          <p class="text-xs text-slate-500 mt-4 leading-relaxed font-sans">
             设立于美国加州。深度对接北美新能源政策与美规准入机制（如 UL 9540A），专注于拓展北美工商业及住宅储能业务链。
           </p>
         </div>
@@ -203,15 +206,14 @@ const resolveUrl = (path: string) => {
 
   <!-- 7. 页脚 -->
   <footer class="bg-slate-900 text-slate-400 py-16 px-6 border-t border-slate-950">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-left">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-left font-sans">
       <div class="space-y-4">
-        <div class="text-white font-bold text-lg flex items-center gap-2">🔋 新能源科技</div>
-        <p class="text-xs leading-relaxed text-slate-400">致力于以高安全、绿色、高效率的电池技术，服务于全球绿色零碳经济 and 能源转型转型战略。</p>
+        <div class="text-white font-bold text-lg flex items-center gap-2">🔋 嘉程新能源</div>
+        <p class="text-xs leading-relaxed text-slate-400">致力于以高安全、绿色、高效率的电池技术，服务于全球绿色零碳经济与能源转型战略。</p>
       </div>
       <div>
         <h4 class="text-white font-bold text-sm mb-4">产品中心</h4>
         <ul class="space-y-2 text-xs text-slate-400">
-          <!-- 👈 修改：页脚这三个跳转链接使用 resolveUrl 动态包装 -->
           <li><a href={resolveUrl('/products')} class="hover:text-emerald-400 transition-colors">储能系列</a></li>
           <li><a href={resolveUrl('/products')} class="hover:text-emerald-400 transition-colors">动力系列</a></li>
           <li><a href={resolveUrl('/products')} class="hover:text-emerald-400 transition-colors">工业电池组</a></li>
@@ -227,11 +229,11 @@ const resolveUrl = (path: string) => {
       </div>
       <div>
         <h4 class="text-white font-bold text-sm mb-4">企业总部</h4>
-        <p class="text-xs leading-relaxed text-slate-400">中国·国家级高新技术产业园区新能源路 88 号<br />Tel: +86 (512) 8888-8888<br />Email: info@yourcompany.com</p>
+        <p class="text-xs leading-relaxed text-slate-400 font-sans">中国·国家级高新技术产业园区新能源路 88 号<br />Tel: +86 (512) 8888-8888<br />Email: info@jc-batteryway.com</p>
       </div>
     </div>
-    <div class="max-w-7xl mx-auto border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500">
-      <div>© {new Date().getFullYear()} 新能源科技股份公司. All rights reserved.</div>
+    <div class="max-w-7xl mx-auto border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 font-sans">
+      <div>© {new Date().getFullYear()} 嘉程新能源股份公司. All rights reserved.</div>
       <div class="flex gap-4 mt-4 md:mt-0">
         <a href="#" class="hover:text-emerald-400 transition-colors">隐私政策</a>
         <a href="#" class="hover:text-emerald-400 transition-colors">ICP备xxxxxx号</a>
@@ -239,7 +241,7 @@ const resolveUrl = (path: string) => {
     </div>
   </footer>
 
-  <!-- ----------------- 🚀 高性能滚动渐入脚本 ----------------- -->
+  <!-- 滚动渐入控制脚本 -->
   <script is:inline>
     const revealObserver = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {

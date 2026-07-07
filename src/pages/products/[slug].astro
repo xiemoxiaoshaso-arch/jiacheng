@@ -1,9 +1,10 @@
 ---
 import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets'; // 👈 导入 Astro 5 原生图片优化组件
 import '../../styles/global.css';
-import Header from '../../components/Header.astro'; // 👈 新增引入导航组件（回退两级）
+import Header from '../../components/Header.astro';
 
-// 👈 新增：统一处理路径和链接补全的辅助函数
+// 统一处理路径和链接补全的辅助函数
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const resolveUrl = (path: string) => {
   if (!path) return '';
@@ -12,43 +13,37 @@ const resolveUrl = (path: string) => {
   return `${base}${path}`;
 };
 
-// 👈 新增：智能判断并获取图片的真实 string 路径（兼容对象与字符串）
-const getUrl = (img: any) => {
-  if (!img) return '';
-  if (typeof img === 'string') {
-    if (img.startsWith('/_astro/') || img.includes(base)) return img;
-    return resolveUrl(img);
-  }
-  return img.src; // Astro 的优化图片对象其 .src 属性已经自带了 /jiacheng 前缀
-};
-
 export async function getStaticPaths() {
   const products = await getCollection('products');
-  return products.map(product => ({
+  
+  // 👈 过滤：基于 Frontmatter 的 lang 字段，确保只为中文版（lang === 'zh'）产品生成路由
+  const zhProducts = products.filter(product => product.data.lang === 'zh');
+
+  return zhProducts.map(product => ({
     params: { slug: product.id },
     props: { product },
   }));
 }
 
 const { product } = Astro.props;
-const { title, category, chemistry, image, datasheet, specs, images } = product.data;
+const { title, category, chemistry, image, datasheet, specs, images, description } = product.data;
 const { Content } = await render(product);
 
-// 👈 修改：提取优化后的主图路径和多图列表路径
-const mainImageUrl = getUrl(image);
-const galleryImages = (images && images.length > 0 ? images : [image]).map(img => getUrl(img));
+// 👈 重构：直接提取原始 Image 对象列表（无需转换成 string），便于 <Image /> 处理
+const galleryImages = images && images.length > 0 ? images : [image];
 
-// 👈 修改：处理 PDF 规格书的路径
+// 处理 PDF 规格书的路径
 const resolvedDatasheet = resolveUrl(datasheet);
 ---
 
-<html lang="zh">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title} - 嘉程新能源</title>
+  {description && <meta name="description" content={description} />}
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-slate-50 text-slate-800 antialiased font-sans">
 
   <!-- 顶部导航栏 -->
   <Header />
@@ -56,28 +51,52 @@ const resolvedDatasheet = resolveUrl(datasheet);
   <main class="max-w-7xl mx-auto px-4 py-12 space-y-8">
     <!-- 面包屑导航 -->
     <nav class="text-xs font-semibold text-slate-400 tracking-wider">
-      首页 > 产品中心 > {category} > {title}
+      <a href={resolveUrl('/')} class="hover:text-emerald-600 transition-colors">首页</a> 
+      <span class="mx-1">&gt;</span> 
+      <a href={resolveUrl('/products')} class="hover:text-emerald-600 transition-colors">产品中心</a> 
+      <span class="mx-1">&gt;</span> 
+      <span class="text-slate-500">{category}</span> 
+      <span class="mx-1">&gt;</span> 
+      <span class="text-slate-600 font-medium">{title}</span>
     </nav>
 
     <!-- 核心板块：经典的左右双卡片分栏布局 -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       
-      <!-- ================= 左侧卡片 (高度约 670px) ================= -->
+      <!-- ================= 左侧卡片 ================= -->
       <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center w-full">
-        <!-- 主图显示框 (使用解析好的主图字符串路径) -->
+        <!-- 👈 重构主图显示框：将所有优化图叠加，通过不透明度动画切换 -->
         <div class="w-full aspect-square bg-slate-50 rounded-xl overflow-hidden flex items-center justify-center p-8 border border-slate-100 relative">
-          <img id="main-product-image" src={mainImageUrl} alt={title} class="max-h-full object-contain transition-all duration-200" />
+          {galleryImages.map((imgObj, idx) => (
+            <Image
+              src={imgObj}
+              alt={`${title} - 视角 ${idx + 1}`}
+              width={600}
+              height={600}
+              widths={[300, 600, 900]}
+              sizes="(max-width: 768px) 100vw, 500px"
+              loading={idx === 0 ? "eager" : "lazy"} // 首张首屏预载，非首张延迟加载
+              class={`absolute max-h-[85%] max-w-[85%] object-contain transition-all duration-300 product-gallery-img ${idx === 0 ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-95 pointer-events-none z-0'}`}
+              data-index={idx}
+            />
+          ))}
         </div>
 
-        <!-- 缩略图滚动条 (使用解析好的多图数组) -->
+        <!-- 👈 重构缩略图滚动条：缩略图本身也使用高阶 <Image /> 进行优化 -->
         {galleryImages.length > 1 && (
           <div class="flex gap-2.5 mt-4 w-full overflow-x-auto pb-1 scrollbar-none justify-start">
-            {galleryImages.map((imgUrl, index) => (
+            {galleryImages.map((imgObj, index) => (
               <button 
-                class={`thumb-btn w-16 h-16 rounded-xl border overflow-hidden flex items-center justify-center p-1.5 bg-slate-50 shrink-0 cursor-pointer transition-all ${index === 0 ? 'border-emerald-600 ring-4 ring-emerald-500/10' : 'border-slate-200 hover:border-slate-300'}`}
-                data-img={imgUrl}
+                class={`thumb-btn w-16 h-16 rounded-xl border overflow-hidden flex items-center justify-center p-1 bg-slate-50 shrink-0 cursor-pointer transition-all ${index === 0 ? 'border-emerald-600 ring-4 ring-emerald-500/10' : 'border-slate-200 hover:border-slate-300'}`}
+                data-target-index={index}
               >
-                <img src={imgUrl} alt="产品角度" class="max-h-full object-contain pointer-events-none" />
+                <Image 
+                  src={imgObj} 
+                  alt="产品角度缩略图" 
+                  width={100}
+                  height={100}
+                  class="max-h-full object-contain pointer-events-none" 
+                />
               </button>
             ))}
           </div>
@@ -92,7 +111,7 @@ const resolvedDatasheet = resolveUrl(datasheet);
         <div class="w-full mt-6 border-t border-slate-100 pt-6">
           <h4 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4 flex items-center gap-1.5">
             <span class="w-1 h-2.5 bg-emerald-600 rounded-sm"></span>
-            符合全球准入认证 (Standards & Certs)
+            符合全球准入认证
           </h4>
           <div class="grid grid-cols-2 gap-3">
             <div class="bg-white p-2.5 rounded-lg border border-slate-200 hover:border-emerald-500/20 transition-all flex items-center gap-2">
@@ -148,7 +167,7 @@ const resolvedDatasheet = resolveUrl(datasheet);
           </p>
         </div>
 
-        <!-- 📊 技术参数表 -->
+        <!-- 技术参数表 -->
         <div>
           <h2 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-1.5">
             📊 核心技术规格参数 (Specifications)
@@ -156,7 +175,7 @@ const resolvedDatasheet = resolveUrl(datasheet);
           <div class="overflow-hidden border border-slate-200 rounded-xl shadow-sm">
             <table class="min-w-full divide-y divide-slate-150 bg-white">
               <tbody class="divide-y divide-slate-100">
-                {specs.map((spec, index) => (
+                {specs.map((spec: any, index: number) => (
                   <tr class={index % 2 === 0 ? 'bg-slate-50/50' : 'bg-white'}>
                     <td class="px-5 py-3 text-xs font-semibold text-slate-500 w-1/2 border-r border-slate-100">{spec.name}</td>
                     <td class="px-5 py-3 text-xs font-bold text-slate-900">{spec.value}</td>
@@ -173,7 +192,6 @@ const resolvedDatasheet = resolveUrl(datasheet);
             <h3 class="font-bold text-slate-900 text-xs">需要定制或获取大货报价？</h3>
             <p class="text-[11px] text-slate-400">我们的应用工程师可为您提供完整的电池Pack或系统方案。</p>
           </div>
-          <!-- 👈 修改：使用 resolveUrl 包裹跳转链接 -->
           <a href={resolveUrl('/contact')} class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition-colors shadow-sm shrink-0">
             联系应用工程师 ➔
           </a>
@@ -183,7 +201,8 @@ const resolvedDatasheet = resolveUrl(datasheet);
     </div>
 
     <!-- 下方：通栏详细介绍 -->
-    <section class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 prose max-w-none">
+    <!-- 👈 修改：应用中文 Typography 类 (prose-slate、prose-p:leading-relaxed) -->
+    <section class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 prose prose-slate max-w-none">
       <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">产品应用与技术细节</h2>
       <div class="mt-4 text-sm text-slate-600 leading-relaxed">
         <Content />
@@ -192,7 +211,7 @@ const resolvedDatasheet = resolveUrl(datasheet);
 
   </main>
 
-  <!-- 🛡️ PDF 规格书留资保护弹窗 -->
+  <!-- PDF 规格书留资保护弹窗 -->
   <div id="pdf-lead-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-[100] opacity-0 pointer-events-none transition-all duration-300">
     <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl border border-slate-200 relative transform translate-y-4 transition-transform duration-300" id="modal-box">
       <button id="close-modal-btn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl cursor-pointer">✕</button>
@@ -230,7 +249,7 @@ const resolvedDatasheet = resolveUrl(datasheet);
     </div>
   </div>
 
-  <!-- 控制脚本 (通过 resolvedDatasheet 传入安全的带 base 前缀的路径) -->
+  <!-- 👈 脚本重构：配合纯原生图片优化，利用不透明度和 Z-Index 做原生动态切换 -->
   <script is:inline define:vars={{ datasheet: resolvedDatasheet }}>
     const openBtn = document.getElementById('download-trigger-btn');
     const closeBtn = document.getElementById('close-modal-btn');
@@ -238,29 +257,34 @@ const resolvedDatasheet = resolveUrl(datasheet);
     const modalBox = document.getElementById('modal-box');
     const form = document.getElementById('lead-form');
 
-    // 缩略图交互切换
-    const mainImg = document.getElementById('main-product-image');
+    // 👈 修改：缩略图交互切换逻辑
+    const galleryImgs = document.querySelectorAll('.product-gallery-img');
     const thumbBtns = document.querySelectorAll('.thumb-btn');
 
     thumbBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
         const targetBtn = e.currentTarget;
-        const newSrc = targetBtn.getAttribute('data-img');
+        const targetIdx = targetBtn.getAttribute('data-target-index');
         
-        if (mainImg) {
-          mainImg.style.opacity = '0';
-          setTimeout(() => {
-            mainImg.src = newSrc;
-            mainImg.style.opacity = '1';
-          }, 150);
-        }
-
+        // 1. 切换缩略图的高亮边框
         thumbBtns.forEach(b => {
           b.classList.remove('border-emerald-600', 'ring-4', 'ring-emerald-500/10');
           b.classList.add('border-slate-200');
         });
         targetBtn.classList.remove('border-slate-200');
         targetBtn.classList.add('border-emerald-600', 'ring-4', 'ring-emerald-500/10');
+
+        // 2. 切换当前显示的主图不透明度和层级（避免破坏原生 Image 生成的 srcset 优化）
+        galleryImgs.forEach(img => {
+          const imgIdx = img.getAttribute('data-index');
+          if (imgIdx === targetIdx) {
+            img.classList.remove('opacity-0', 'scale-95', 'pointer-events-none', 'z-0');
+            img.classList.add('opacity-100', 'scale-100', 'z-10');
+          } else {
+            img.classList.remove('opacity-100', 'scale-100', 'z-10');
+            img.classList.add('opacity-0', 'scale-95', 'pointer-events-none', 'z-0');
+          }
+        });
       });
     });
 
