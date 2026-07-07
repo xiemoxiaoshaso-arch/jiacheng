@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content'; // 👈 导入内容层读取函数
-import '../styles/global.css';
-import Header from '../components/Header.astro'; 
+import '../../styles/global.css';
+import Header from '../../components/Header.astro'; 
 
 // 1. 动态拉取 src/content/careers 文件夹下的所有岗位 md 文件
 const rawJobs = await getCollection('careers');

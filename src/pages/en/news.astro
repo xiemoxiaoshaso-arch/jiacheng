@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
-import '../styles/global.css';
-import Header from '../components/Header.astro'; 
+import '../../styles/global.css';
+import Header from '../../components/Header.astro'; 
 
 // 1. 动态拉取 src/content/news 目录下的所有 markdown 电池文章
 const rawNews = await getCollection('news');
