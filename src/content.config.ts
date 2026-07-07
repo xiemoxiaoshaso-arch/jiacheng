@@ -10,7 +10,7 @@ const productsCollection = defineCollection({
     category: z.string(),
     chemistry: z.string(),
     image: image(), // 👈 核心修改：从 z.string() 变更为 image() 助手
-    images: z.array(z.string()).optional(), 
+    images: z.array(image()).optional(), 
     datasheet: z.string(),
     specs: z.array(z.object({
       name: z.string(),
