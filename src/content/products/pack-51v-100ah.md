@@ -2,7 +2,7 @@
 title: "51.2V 100Ah 机架式储能电池包"
 category: "电池包 (Pack)"
 chemistry: "磷酸铁锂 (LFP)"
-image: "/images/pack-51v-100ah.jpg"
+image: "../../assets/images/pack-51v-100ah.jpg"
 datasheet: "/pdfs/Pack-51v-100ah-Datasheet.pdf"
 specs:
   - name: "标称电压 (Nominal Voltage)"

@@ -19,7 +19,7 @@ import Header from '../components/Header.astro'; // 引入品牌绿智能导航
   <section class="relative w-full h-[300px] md:h-[400px] overflow-hidden flex items-center justify-center bg-slate-950 border-b border-slate-200/60">
     <!-- 背景大图 (可放入一张展现客服、商务交流或企业大厦的前沿图) -->
     <img 
-      src="/images/contact-banner.png" 
+      src={`${import.meta.env.BASE_URL}/images/contact-banner.jpg`} 
       alt="嘉程联系我们" 
       class="absolute inset-0 w-full h-full object-cover opacity-95 hover:scale-[1.02] transition-transform duration-[10000ms] ease-out"
     />
