@@ -1,0 +1,189 @@
+---
+import { getCollection } from 'astro:content';
+import '../styles/global.css';
+import Header from '../components/Header.astro'; 
+
+// 1. 动态拉取 src/content/news 目录下的所有 markdown 电池文章
+const rawNews = await getCollection('news');
+
+// 2. 💡 黄金逻辑：按照发布日期（date）对所有新闻进行降序排序，确保最新的报道永远在最顶部
+const newsList = rawNews.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+---
+
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>新闻中心 - 嘉程新能源</title>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+
+  <!-- 1. 导航栏 -->
+  <Header />
+
+  <!-- 2. 巨幕 Banner -->
+  <section class="relative w-full h-[300px] md:h-[400px] overflow-hidden flex items-center justify-center bg-slate-950 border-b border-slate-200/60">
+    <img 
+      src="/images/news-banner.jpg" 
+      alt="嘉程新闻中心" 
+      class="absolute inset-0 w-full h-full object-cover opacity-95 hover:scale-[1.02] transition-transform duration-[10000ms] ease-out"
+    />
+    <div class="absolute inset-0 bg-slate-950/35 pointer-events-none"></div>
+    <div class="absolute inset-0 bg-gradient-to-tr from-green-500/10 via-transparent to-blue-500/10 pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-5xl mx-auto text-center px-6 space-y-4">
+      <span class="inline-block px-3 py-1 bg-green-500/20 text-green-300 text-[10px] font-bold tracking-widest uppercase rounded-full border border-green-500/30 animate-pulse">
+        新闻中心 // NEWS CENTER
+      </span>
+      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight md:whitespace-nowrap">
+        <span class="inline-block">追踪科技前沿，</span><span class="inline-block">见证嘉程成长</span>
+      </h1>
+      <p class="text-green-400 font-extrabold text-[10px] md:text-xs tracking-wider uppercase font-mono drop-shadow-[0_1px_5px_rgba(0,0,0,0.3)]">
+        TRACKING TECHNOLOGY FRONTIERS, WITNESSING THE GROWTH OF JIACHENG
+      </p>
+    </div>
+  </section>
+
+  <!-- 3. 企业简介正文过渡区 -->
+  <section class="w-full bg-white py-12 border-b border-slate-100">
+    <div class="max-w-4xl mx-auto text-center px-6">
+      <p class="text-slate-500 text-xs md:text-sm leading-relaxed max-w-xl mx-auto font-medium">
+        为您提供第一手的企业研发制造动态，以及客观、前沿的全球新能源电池与储能行业资讯深度解析。
+      </p>
+    </div>
+  </section>
+
+  <main class="max-w-7xl mx-auto px-4 py-12 space-y-12">
+    
+    <!-- 4. 动态分类筛选器 -->
+    <div class="flex justify-center gap-4 border-b border-slate-200 pb-6 reveal-section opacity-0 translate-y-8 transition-all duration-1000">
+      <button 
+        data-filter="all" 
+        class="filter-btn px-6 py-2 rounded-full text-sm font-bold bg-green-600 text-white shadow-md shadow-green-600/10 hover:scale-105 transition-all cursor-pointer"
+      >
+        全部新闻
+      </button>
+      <button 
+        data-filter="corporate" 
+        class="filter-btn px-6 py-2 rounded-full text-sm font-bold bg-white text-slate-600 hover:text-green-600 border border-slate-200 hover:scale-105 transition-all cursor-pointer"
+      >
+        企业新闻
+      </button>
+      <button 
+        data-filter="industry" 
+        class="filter-btn px-6 py-2 rounded-full text-sm font-bold bg-white text-slate-600 hover:text-green-600 border border-slate-200 hover:scale-105 transition-all cursor-pointer"
+      >
+        行业新闻
+      </button>
+    </div>
+
+    <!-- 5. 动态新闻卡片网格 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="news-grid">
+      {newsList.map(news => (
+        <div 
+          class="news-card bg-white rounded-2xl border border-slate-300 shadow-sm hover:shadow-md hover:border-green-500/30 transition-all duration-300 overflow-hidden flex flex-col justify-between group reveal-section opacity-0 translate-y-8 transition-all duration-1000"
+          data-category={news.data.category}
+        >
+          <!-- 图片区 -->
+          <div class="h-52 w-full bg-slate-100 overflow-hidden relative border-b border-slate-100">
+            <img src={news.data.image} alt={news.data.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            
+            <span class={
+              news.data.category === 'corporate' 
+                ? 'absolute top-4 left-4 text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-sm border bg-green-50 text-green-700 border-green-200/60' 
+                : 'absolute top-4 left-4 text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-sm border bg-cyan-50 text-cyan-700 border-cyan-200/60'
+            }>
+              {news.data.categoryName}
+            </span>
+          </div>
+
+          <!-- 正文区 -->
+          <div class="p-6 md:p-8 space-y-4">
+            <div class="text-[11px] font-bold text-slate-400 font-mono flex items-center gap-1.5">
+              📅 {news.data.date}
+            </div>
+            <h2 class="text-xl font-black text-slate-900 group-hover:text-green-600 transition-colors leading-snug">
+              {news.data.title}
+            </h2>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              {news.data.excerpt}
+            </p>
+          </div>
+
+          <!-- 底部链接 (指向 md 文件自动生成的 id) -->
+          <div class="px-6 md:px-8 pb-6 md:pb-8 bg-white">
+            <a 
+              href={`/news/${news.id}`} 
+              class="inline-block text-xs font-bold text-green-600 hover:text-green-700 flex items-center gap-1 transition-all group-hover:translate-x-1"
+            >
+              阅读全文 ➔
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-slate-900 text-slate-400 py-12 px-6 border-t border-slate-950 mt-20">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+      <div>© {new Date().getFullYear()} 嘉程新能源股份公司. All rights reserved.</div>
+      <div class="flex gap-6">
+        <a href="/" class="hover:text-green-600">首页</a>
+        <a href="/products" class="hover:text-green-600">产品中心</a>
+        <a href="/contact" class="hover:text-green-600">在线留言</a>
+      </div>
+    </div>
+  </footer>
+
+  <script is:inline>
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const newsCards = document.querySelectorAll('.news-card');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const selectedCategory = e.currentTarget.getAttribute('data-filter');
+
+        filterBtns.forEach(b => {
+          b.className = "filter-btn px-6 py-2 rounded-full text-sm font-bold bg-white text-slate-600 hover:text-green-600 border border-slate-200 hover:scale-105 transition-all cursor-pointer";
+        });
+        e.currentTarget.className = "filter-btn px-6 py-2 rounded-full text-sm font-bold bg-green-600 text-white shadow-md shadow-green-600/10 hover:scale-105 transition-all cursor-pointer";
+
+        newsCards.forEach(card => {
+          const cardCategory = card.getAttribute('data-category');
+          
+          if (selectedCategory === 'all' || cardCategory === selectedCategory) {
+            card.style.display = 'flex';
+            setTimeout(() => {
+              card.style.opacity = '1';
+              card.style.transform = 'translateY(0)';
+            }, 10);
+          } else {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(8px)';
+            setTimeout(() => {
+              card.style.display = 'none';
+            }, 200);
+          }
+        });
+      });
+    });
+
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('opacity-0', 'translate-y-8');
+          entry.target.classList.add('opacity-100', 'translate-y-0');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal-section').forEach(section => {
+      revealObserver.observe(section);
+    });
+  </script>
+
+</body>
+</html>

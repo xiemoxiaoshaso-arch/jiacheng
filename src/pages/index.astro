@@ -1,0 +1,266 @@
+---
+import { getCollection } from 'astro:content';
+import '../styles/global.css'; // 👈 引入全局 Tailwind 样式
+import Header from '../components/Header.astro'; // 👈 新增引入导航组件
+
+// 动态拉取产品库中的所有电池（展示在首页的“明星产品”板块中）
+const allProducts = await getCollection('products');
+// 仅挑选前两款作为首页的“明星产品”展示，避免首页过长
+const featuredProducts = allProducts.slice(0, 2);
+---
+
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>嘉程新能源 | 全球领先的锂电池及储能系统解决方案提供商</title>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+  <!-- 1. 顶部导航栏 -->
+  <Header /> <!-- 👈 直接用这一个标签替代以前那一大段旧导航代码 -->
+
+  <!-- 2. 首屏科技感宣誓 (Hero Section) -->
+  <section class="relative bg-slate-900 text-white py-24 md:py-32 overflow-hidden">
+    <!-- 渐变光，营造高端新能源科技感 -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.15),transparent_50%)]"></div>
+    
+    <div class="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div class="lg:col-span-7 space-y-6">
+        <span class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-500/20">
+          工业级 & 储能级锂电池方案专家
+        </span>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+          驱动绿色未来，<br />
+          以安全与品质定义新能源
+        </h1>
+        <p class="text-slate-300 text-lg md:text-xl max-w-xl">
+          我们专注于高安全、长寿命磷酸铁锂（LFP）电芯研发与储能系统集成，年产能规划 15 GWh，为全球客户提供一站式定制化动力与储能包方案。
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 pt-4">
+          <a href="/products" class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-center font-bold rounded-lg shadow-lg transition-colors">
+            浏览产品中心 ➔
+          </a>
+          <a href="/contact" class="px-8 py-4 border border-slate-500 hover:border-white text-center font-bold rounded-lg transition-colors">
+            获取大货报价
+          </a>
+        </div>
+      </div>
+      
+      <!-- 右侧：放置一张高科技感的电池包或工厂渲染图占位 -->
+      <!-- 右侧：玻璃智能监控面板 (色调不变，保持原有的深邃冷色调) -->
+      <div class="lg:col-span-5 flex justify-center">
+        <div class="w-full max-w-md bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-800 p-6 shadow-[0_15px_35px_rgba(16,185,129,0.15)] relative">
+          <!-- 顶部状态栏与呼吸灯 -->
+          <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+              <span class="text-[11px] font-bold tracking-widest text-emerald-400 uppercase font-mono">SYS MONITOR // LIVE</span>
+            </div>
+            <span class="text-[10px] text-slate-500 font-mono">ID: LFP_CELL_280AH</span>
+          </div>
+
+          <!-- 仿真监测指标网格 -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+              <div class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">电芯工作电压</div>
+              <div class="text-2xl font-extrabold text-emerald-400 font-mono mt-1" id="live-voltage">3.284 V</div>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+              <div class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">实时工作温度</div>
+              <div class="text-2xl font-extrabold text-cyan-400 font-mono mt-1" id="live-temp">25.3 ℃</div>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+              <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">荷电状态 (SOC)</div>
+              <div class="text-2xl font-extrabold text-white font-mono mt-1">98.2 %</div>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+              <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">健康度 (SOH)</div>
+              <div class="text-2xl font-extrabold text-white font-mono mt-1">100.0 %</div>
+            </div>
+          </div>
+
+          <!-- 底部压力安全监测栏 -->
+          <div class="mt-4 p-3 bg-slate-950 rounded-lg border border-slate-800/80 text-center flex items-center justify-between text-xs font-mono text-slate-400">
+            <span>压力/排气监测:</span>
+            <span class="text-emerald-400 font-bold">NORMAL 🟢</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 核心实力数据 (Key Stats) -->
+  <section class="max-w-7xl mx-auto px-6 -mt-12 relative z-20">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
+        <div class="text-3xl md:text-4xl font-extrabold text-emerald-600">15 GWh</div>
+        <div class="text-xs md:text-sm text-slate-500 mt-1 font-medium">规划年产能规模</div>
+      </div>
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
+        <div class="text-3xl md:text-4xl font-extrabold text-emerald-600">6000+ 次</div>
+        <div class="text-xs md:text-sm text-slate-500 mt-1 font-medium">LFP电芯循环寿命</div>
+      </div>
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
+        <div class="text-3xl md:text-4xl font-extrabold text-emerald-600">200+ 人</div>
+        <div class="text-xs md:text-sm text-slate-500 mt-1 font-medium">核心研发与技术团队</div>
+      </div>
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
+        <div class="text-3xl md:text-4xl font-extrabold text-emerald-600">50+ 个</div>
+        <div class="text-xs md:text-sm text-slate-500 mt-1 font-medium">全球交付服务国家</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 动态明星产品板块 (Featured Products) -->
+  <section class="max-w-7xl mx-auto px-6 py-20 bg-slate-100/50 rounded-3xl my-12 border border-slate-200/40">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
+      <div>
+        <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase">Star Products</span>
+        <h2 class="text-3xl font-extrabold text-slate-900 mt-2">推荐明星产品</h2>
+        <p class="text-slate-500 mt-2 text-sm max-w-lg">
+          精选高能量密度电芯与高兼容性储能电池包，提供汽车级（Automotive-Grade）极端工况品质保障。
+        </p>
+      </div>
+      <a href="/products" class="mt-4 md:mt-0 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-2">
+        前往产品中心（所有型号） ➔
+      </a>
+    </div>
+
+    <!-- 这里将动态循环渲染前两款产品卡片 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {featuredProducts.map(product => (
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div class="p-8">
+            <div class="flex justify-between items-center mb-6">
+              <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                {product.data.chemistry}
+              </span>
+              <span class="text-xs text-slate-400 font-medium">{product.data.category}</span>
+            </div>
+            
+            <div class="h-56 w-full bg-slate-50 rounded-xl flex items-center justify-center p-6 mb-6 border border-slate-100">
+              <img src={product.data.image} alt={product.data.title} class="max-h-full object-contain" />
+            </div>
+
+            <h3 class="text-2xl font-bold text-slate-900 mb-3">{product.data.title}</h3>
+            
+            <!-- 指标精简摘要 -->
+            <div class="grid grid-cols-2 gap-4 text-sm border-t border-slate-100 pt-4 mt-4">
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <div class="text-xs text-slate-400">容量指标</div>
+                <div class="font-bold text-slate-800 mt-1">{product.data.specs.find(s => s.name.includes('容量'))?.value || '详见参数表'}</div>
+              </div>
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <div class="text-xs text-slate-400">标称电压</div>
+                <div class="font-bold text-slate-800 mt-1">{product.data.specs.find(s => s.name.includes('电压'))?.value || '详见参数表'}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="px-8 pb-8 bg-white">
+            <!-- 👈 跳转链接同样使用新的 product.id 变量 -->
+            <a href={`/products/${product.id}`} class="block w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-center text-sm font-bold rounded-xl shadow-sm transition-colors">
+              查看核心技术参数表 ➔
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- 5. 智造实力与质量管理体系 -->
+  <section class="bg-slate-900 text-white py-20">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div class="lg:col-span-6 space-y-6">
+        <h2 class="text-3xl font-extrabold tracking-tight">以汽车级（Automotive-grade）标准管控品质</h2>
+        <p class="text-slate-300 leading-relaxed">
+          电池的品质决定了整个系统的安全。我们导入了严苛的质量控制网络，并在全工序全面部署全自动化追溯系统（MES）。
+        </p>
+        <ul class="space-y-3 text-slate-400 text-sm">
+          <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 荣获 <strong>IATF 16949</strong> 汽车级管理体系认证</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 全自动无人洁净车间（万级无尘，控制水氧参数）</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 电芯出厂进行 100% X-ray、充放电及超声波无损探伤检测</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 产品全面符合 UL, CE, CB, UN38.3, IEC 62619 安全规范</li>
+        </ul>
+      </div>
+      <div class="lg:col-span-6 grid grid-cols-2 gap-4">
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
+          <div class="text-2xl font-bold text-emerald-400">万级无尘</div>
+          <div class="text-xs text-slate-400 mt-1">环境洁净度管控</div>
+        </div>
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
+          <div class="text-2xl font-bold text-emerald-400">98.5%</div>
+          <div class="text-xs text-slate-400 mt-1">生产线综合自动化率</div>
+        </div>
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
+          <div class="text-2xl font-bold text-emerald-400">100%</div>
+          <div class="text-xs text-slate-400 mt-1">出厂全流程条码可追溯</div>
+        </div>
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
+          <div class="text-2xl font-bold text-emerald-400">CNAS</div>
+          <div class="text-xs text-slate-400 mt-1">国家级标准联合实验室</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. 页脚 (Footer) -->
+  <footer class="bg-slate-950 text-slate-500 py-12 px-6 border-t border-slate-900">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div class="space-y-4">
+        <div class="text-white font-bold text-lg flex items-center gap-2">🔋 新能源科技</div>
+        <p class="text-xs leading-relaxed">致力于以高安全、绿色、高效率的电池技术，服务于全球绿色零碳经济和能源转型转型战略。</p>
+      </div>
+      <div>
+        <h4 class="text-white font-bold text-sm mb-4">产品中心</h4>
+        <ul class="space-y-2 text-xs">
+          <li><a href="/products" class="hover:text-white transition-colors">储能系列</a></li>
+          <li><a href="/products" class="hover:text-white transition-colors">动力系列</a></li>
+          <li><a href="/products" class="hover:text-white transition-colors">工业电池组</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold text-sm mb-4">质量与认证</h4>
+        <ul class="space-y-2 text-xs">
+          <li>IATF 16949 汽车体系</li>
+          <li>ISO 9001 / 14001</li>
+          <li>UL1973 / IEC62619 / UN38.3</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold text-sm mb-4">企业总部</h4>
+        <p class="text-xs leading-relaxed">中国·国家级高新技术产业园区新能源路 88 号<br />Tel: +86 (512) 8888-8888<br />Email: info@yourcompany.com</p>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto border-t border-slate-900 pt-8 flex flex-col md:flex-row justify-between items-center text-xs">
+      <div>© {new Date().getFullYear()} 新能源科技股份公司. All rights reserved.</div>
+      <div class="flex gap-4 mt-4 md:mt-0">
+        <a href="#" class="hover:text-white transition-colors">隐私政策</a>
+        <a href="#" class="hover:text-white transition-colors">ICP备xxxxxx号</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+
+<!-- ----------------- 🚀 高性能数据波动脚本 ----------------- -->
+  <script is:inline>
+    const vEl = document.getElementById('live-voltage');
+    const tEl = document.getElementById('live-temp');
+    
+    if (vEl && tEl) {
+      setInterval(() => {
+        // 让电压在 3.280V ~ 3.288V 之间高频波动
+        const fakeVoltage = (3.280 + Math.random() * 0.008).toFixed(3);
+        vEl.textContent = `${fakeVoltage} V`;
+        
+        // 让温度在 25.1℃ ~ 25.5℃ 之间平滑微动
+        const fakeTemp = (25.1 + Math.random() * 0.4).toFixed(1);
+        tEl.textContent = `${fakeTemp} ℃`;
+      }, 2000); // 每 2 秒微动一次
+    }
+  </script>
+
+</html>
