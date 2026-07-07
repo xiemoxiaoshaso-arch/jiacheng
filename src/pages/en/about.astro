@@ -22,33 +22,30 @@ const resolveUrl = (path: string) => {
   <Header />
 
   <!-- 2. 🌟 品牌定制·公司简介高清无界微光巨幕 Banner (电影级高对比：暗大图 + 发光白字，完美可读) -->
-  <section class="relative w-full h-[300px] md:h-[400px] overflow-hidden flex items-center justify-center bg-slate-950 border-b border-slate-200/60">
-    <!-- 背景大图 (保持 95% 像素级清晰) -->
+  <section class="relative w-full h-[320px] md:h-[460px] overflow-hidden flex items-center justify-center bg-slate-950 border-b border-slate-200/60">
     <img 
-      src={resolveUrl('/images/about-banner.jpg')}
-      alt="JC New Energy Intelligent Manufacturing Base" 
-      class="absolute inset-0 w-full h-full object-cover opacity-95 hover:scale-[1.02] transition-transform duration-[10000ms] ease-out"
+      src={`${base}/images/about-banner.jpg`}
+      alt="Leading Zero-Carbon Transformation" 
+      class="absolute inset-0 w-full h-full object-cover opacity-90 hover:scale-[1.01] transition-transform duration-[12000ms] ease-out"
     />
     
-    <!-- 电影级暗色偏光罩。提供顶级的白色文字对比度底盘 -->
-    <div class="absolute inset-0 bg-slate-950/35 pointer-events-none"></div>
+    <div class="absolute inset-0 bg-slate-950/45 pointer-events-none"></div>
     
-    <!-- 极淡绿蓝微光层 -->
-    <div class="absolute inset-0 bg-gradient-to-tr from-green-500/10 via-transparent to-blue-500/10 pointer-events-none"></div>
+    <div class="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 via-transparent to-cyan-500/10 pointer-events-none"></div>
     
-    <!-- 底部渐变白色罩 -->
-    <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/30 to-transparent pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white/20 to-transparent pointer-events-none"></div>
 
-    <!-- Banner 内部文字 (纯白大字标 + 品牌绿英文字，100% 锐利可读) -->
-    <div class="relative z-10 max-w-5xl mx-auto text-center px-6 space-y-4">
-      <span class="inline-block px-3 py-1 bg-green-500/20 text-green-300 text-[10px] font-bold tracking-widest uppercase rounded-full border border-green-500/30 animate-pulse">
+    <div class="relative z-10 max-w-5xl mx-auto text-center px-4 md:px-8 space-y-4">
+      <span class="inline-block px-3 py-1 bg-emerald-500/20 text-emerald-300 text-[10px] font-bold tracking-widest uppercase rounded-full border border-emerald-500/30">
         ABOUT US // COMPANY PROFILE
       </span>
-      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.3)] md:whitespace-nowrap">
-        <span class="inline-block">Leading Zero-Carbon Transformation,</span> <span class="inline-block">Powering the World with Green Energy</span>
+      
+      <h1 class="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight md:leading-snug break-words max-w-4xl mx-auto drop-shadow-[0_2px_15px_rgba(0,0,0,0.5)]">
+        Leading Zero-Carbon Transformation, <br class="hidden md:inline" />Powering the World
       </h1>
-      <p class="text-green-400 font-extrabold text-[10px] md:text-xs tracking-wider uppercase font-mono drop-shadow-[0_1px_5px_rgba(0,0,0,0.3)]">
-        Leading the zero-carbon transformation with next-generation battery technology
+      
+      <p class="text-emerald-400 font-bold text-[9px] md:text-xs tracking-wider md:tracking-widest uppercase font-mono max-w-2xl mx-auto drop-shadow-[0_1px_5px_rgba(0,0,0,0.3)] leading-relaxed">
+        LEADING THE ZERO-CARBON TRANSFORMATION WITH NEXT-GENERATION BATTERY TECHNOLOGY
       </p>
     </div>
   </section>
