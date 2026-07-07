@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content'; // 👈 新增导入 Astro 5 原生渲染器
-import '../../styles/global.css';
-import Header from '../../components/Header.astro';
+import '../../../styles/global.css';
+import Header from '../../../components/Header.astro';
 
 export async function getStaticPaths() {
   const newsList = await getCollection('news');
