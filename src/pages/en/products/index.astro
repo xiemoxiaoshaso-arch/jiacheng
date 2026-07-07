@@ -1,11 +1,12 @@
 ---
 import { getCollection } from 'astro:content'; 
+import { Image } from 'astro:assets'; // 👈 核心修复：引入 Astro 官方图片优化组件，防止打包报错 Image is not defined
 import '../../../styles/global.css';
 import Header from '../../../components/Header.astro'; 
 
-// 1. 动态过滤出英文版的产品（如果你的 products 已经通过文件名 en 区分，可以加上过滤逻辑）
-// 这里默认读取全部，并在前端字段提取时做好容错
-const products = await getCollection('products');
+// 1. 🌟 核心 i18n 逻辑：在英文版产品目录中，过滤出仅限英文版（文件名包含 '-en'）的产品
+const allProducts = await getCollection('products');
+const products = allProducts.filter(p => p.id.includes('-en'));
 
 // 💡 将电池的技术规格参数，转换为供前端 JavaScript 读取的轻量安全 JSON
 const productsJSON = products.map(p => ({
@@ -61,50 +62,56 @@ const resolveUrl = (path: string) => {
 
   <main class="max-w-7xl mx-auto px-4 py-16 pb-32">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {products.map(product => (
-        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md hover:border-green-500/20 transition-all duration-300 flex flex-col justify-between relative group">
-          
-          <label class="absolute top-4 left-4 z-10 flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-slate-200/80 text-[11px] font-bold text-slate-600 cursor-pointer shadow-sm select-none uppercase tracking-wider hover:text-slate-900 transition-colors">
-            <input type="checkbox" class="compare-checkbox w-4 h-4 accent-green-600 cursor-pointer rounded-md" data-id={product.id} />
-            Compare
-          </label>
-
-          <div class="p-6 pt-16">
-            <div class="flex justify-between items-center mb-4">
-              <span class="text-xs font-bold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100 uppercase tracking-wider">
-                {product.data.chemistry}
-              </span>
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">{product.data.category}</span>
-            </div>
-            
-            <div class="h-48 w-full bg-slate-50/50 rounded-xl flex items-center justify-center p-6 mb-6 border border-slate-100 group-hover:bg-slate-50 transition-colors">
-              <Image src={product.data.image} alt={product.data.title} class="max-h-full object-contain group-hover:scale-105 transition-transform duration-500" />
-            </div>
-            <h2 class="text-lg md:text-xl font-black text-slate-900 tracking-tight mb-3 line-clamp-1">{product.data.title}</h2>
-            
-            <div class="space-y-1.5 text-xs md:text-sm text-slate-500 border-t border-slate-150 pt-4 font-medium">
-              <div class="flex justify-between">
-                <span>Capacity:</span> 
-                <span class="font-bold text-slate-800">
-                  {product.data.specs.find(s => s.name.toLowerCase().includes('容量') || s.name.toLowerCase().includes('capacity'))?.value || 'See Datasheet'}
-                </span>
-              </div>
-              <div class="flex justify-between">
-                <span>Voltage:</span> 
-                <span class="font-bold text-slate-800">
-                  {product.data.specs.find(s => s.name.toLowerCase().includes('电压') || s.name.toLowerCase().includes('voltage'))?.value || 'See Datasheet'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="p-6 bg-slate-50/50 border-t border-slate-100">
-            <a href={resolveUrl(`/products/${product.id}`)} class="block w-full py-3 bg-slate-900 hover:bg-slate-800 text-white text-center text-xs font-bold rounded-xl transition-colors uppercase tracking-widest">
-              Technical Datasheet ➔
-            </a>
-          </div>
+      {products.length === 0 ? (
+        <div class="col-span-full text-center py-12 text-slate-400 text-sm">
+          No English products found. Please add a product file named with "-en" suffix to show here.
         </div>
-      ))}
+      ) : (
+        products.map(product => (
+          <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md hover:border-green-500/20 transition-all duration-300 flex flex-col justify-between relative group">
+            
+            <label class="absolute top-4 left-4 z-10 flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-slate-200/80 text-[11px] font-bold text-slate-600 cursor-pointer shadow-sm select-none uppercase tracking-wider hover:text-slate-900 transition-colors">
+              <input type="checkbox" class="compare-checkbox w-4 h-4 accent-green-600 cursor-pointer rounded-md" data-id={product.id} />
+              Compare
+            </label>
+
+            <div class="p-6 pt-16">
+              <div class="flex justify-between items-center mb-4">
+                <span class="text-xs font-bold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100 uppercase tracking-wider">
+                  {product.data.chemistry}
+                </span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">{product.data.category}</span>
+              </div>
+              
+              <div class="h-48 w-full bg-slate-50/50 rounded-xl flex items-center justify-center p-6 mb-6 border border-slate-100 group-hover:bg-slate-50 transition-colors">
+                <Image src={product.data.image} alt={product.data.title} class="max-h-full object-contain group-hover:scale-105 transition-transform duration-500" />
+              </div>
+              <h2 class="text-lg md:text-xl font-black text-slate-900 tracking-tight mb-3 line-clamp-1">{product.data.title}</h2>
+              
+              <div class="space-y-1.5 text-xs md:text-sm text-slate-500 border-t border-slate-150 pt-4 font-medium">
+                <div class="flex justify-between">
+                  <span>Capacity:</span> 
+                  <span class="font-bold text-slate-800">
+                    {product.data.specs.find(s => s.name.toLowerCase().includes('容量') || s.name.toLowerCase().includes('capacity'))?.value || 'See Datasheet'}
+                  </span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Voltage:</span> 
+                  <span class="font-bold text-slate-800">
+                    {product.data.specs.find(s => s.name.toLowerCase().includes('电压') || s.name.toLowerCase().includes('voltage'))?.value || 'See Datasheet'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 bg-slate-50/50 border-t border-slate-100">
+              <a href={resolveUrl(`/en/products/${product.id}`)} class="block w-full py-3 bg-slate-900 hover:bg-slate-800 text-white text-center text-xs font-bold rounded-xl transition-colors uppercase tracking-widest">
+                Technical Datasheet ➔
+              </a>
+            </div>
+          </div>
+        ))
+      )}
     </div>
   </main>
 
@@ -137,8 +144,8 @@ const resolveUrl = (path: string) => {
       <div>© {new Date().getFullYear()} JC New Energy Co., Ltd. All rights reserved.</div>
       <div class="flex gap-6 uppercase tracking-wider font-semibold">
         <a href={resolveUrl('/')} class="hover:text-green-600">Home</a>
-        <a href={resolveUrl('/products')} class="hover:text-green-600">Products</a>
-        <a href={resolveUrl('/contact')} class="hover:text-green-600">Inquiry</a>
+        <a href={resolveUrl('/en/products')} class="hover:text-green-600">Products</a>
+        <a href={resolveUrl('/en/contact')} class="hover:text-green-600">Inquiry</a>
       </div>
     </div>
   </footer>
@@ -154,7 +161,7 @@ const resolveUrl = (path: string) => {
     const closeModalBtn = document.getElementById('close-compare-modal-btn');
     const tableContainer = document.getElementById('compare-table-container');
 
-    // 💡 核心对齐词典：如果后台源文件包含中文技术标，在渲染时强行本地化翻译为出海级标准语
+    // 💡 核心对齐词典：如果是中文指标，在前端渲染时强行本地化翻译为出海级标准语
     const specNameMap = {
       '标称电压': 'Nominal Voltage',
       '额定电压': 'Rated Voltage',
@@ -194,7 +201,6 @@ const resolveUrl = (path: string) => {
       } else {
         compareBar.classList.add('translate-y-24', 'opacity-0');
       }
-      // 至少选择 2 款，才激活参数 PK 按钮
       startCompareBtn.disabled = selectedIds.length < 2;
     }
 
@@ -216,7 +222,6 @@ const resolveUrl = (path: string) => {
     }
     
     closeModalBtn?.addEventListener('click', closeCompareModal);
-    // 修复 Bug：显式绑定 compareModal 的点击遮罩层关闭
     compareModal?.addEventListener('click', (e) => {
       if (e.target === compareModal) closeCompareModal();
     });
@@ -224,7 +229,6 @@ const resolveUrl = (path: string) => {
     function generateCompareTable() {
       const selectedProducts = productsJSON.filter(p => selectedIds.includes(p.id));
       
-      // 提取并清洗出所有并集指标 Key
       const allSpecKeys = new Set();
       selectedProducts.forEach(p => {
         p.specs.forEach(s => allSpecKeys.add(s.name));
@@ -233,7 +237,6 @@ const resolveUrl = (path: string) => {
 
       let html = `<table class="min-w-full divide-y divide-slate-200 text-left bg-white text-xs md:text-sm">`;
       
-      // 表头拼装
       html += `<thead class="bg-slate-50/70"><tr>`;
       html += `<th class="p-4 font-bold text-slate-400 uppercase w-1/4 border-r border-slate-150 tracking-wider">Technical Metrics</th>`;
       selectedProducts.forEach(p => {
@@ -249,12 +252,10 @@ const resolveUrl = (path: string) => {
       });
       html += `</tr></thead>`;
 
-      // 表体行拼装
       html += `<tbody class="divide-y divide-slate-150">`;
       specKeysArray.forEach((key, index) => {
         const bgRowClass = index % 2 === 0 ? 'bg-slate-50/30' : 'bg-white';
         html += `<tr class="${bgRowClass} hover:bg-slate-50/80 transition-colors">`;
-        // 左侧指标名通过映射函数自动重映射为英文
         html += `<td class="p-4 font-bold text-slate-500 border-r border-slate-150 uppercase tracking-wider">${getCleanSpecName(key)}</td>`;
         
         selectedProducts.forEach(p => {
