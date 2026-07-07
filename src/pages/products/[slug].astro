@@ -158,8 +158,8 @@ const resolvedDatasheet = resolveUrl(datasheet);
               <tbody class="divide-y divide-slate-100">
                 {specs.map((spec, index) => (
                   <tr class={index % 2 === 0 ? 'bg-slate-50/50' : 'bg-white'}>
-                    <td class="px-5 py-4.5 text-xs font-semibold text-slate-500 w-1/2 border-r border-slate-100">{spec.name}</td>
-                    <td class="px-5 py-4.5 text-xs font-bold text-slate-900">{spec.value}</td>
+                    <td class="px-5 py-3 text-xs font-semibold text-slate-500 w-1/2 border-r border-slate-100">{spec.name}</td>
+                    <td class="px-5 py-3 text-xs font-bold text-slate-900">{spec.value}</td>
                   </tr>
                 ))}
               </tbody>
