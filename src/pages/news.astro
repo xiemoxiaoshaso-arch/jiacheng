@@ -39,7 +39,8 @@ const newsList = rawNews.sort((a, b) => new Date(b.data.date).getTime() - new Da
     />
     <div class="absolute inset-0 bg-slate-950/35 pointer-events-none"></div>
     <div class="absolute inset-0 bg-gradient-to-tr from-green-500/10 via-transparent to-blue-500/10 pointer-events-none"></div>
-    <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+    <!-- 调整为极淡、极矮的渐变（高度缩减至 40px，最大不透明度仅为 30%，彻底消融死白带） -->
+    <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/30 to-transparent pointer-events-none"></div>
 
     <div class="relative z-10 max-w-5xl mx-auto text-center px-6 space-y-4">
       <span class="inline-block px-3 py-1 bg-green-500/20 text-green-300 text-[10px] font-bold tracking-widest uppercase rounded-full border border-green-500/30 animate-pulse">
