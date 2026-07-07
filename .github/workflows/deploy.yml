@@ -11,6 +11,7 @@ permissions:
   id-token: write
 
 jobs:
+  # 1. 构建打包任务
   build:
     runs-on: ubuntu-latest
     steps:
@@ -19,3 +20,15 @@ jobs:
 
       - name: Install, build, and upload your site
         uses: withastro/action@v6
+
+  # 2. 部署发布任务（新增这部分）
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
