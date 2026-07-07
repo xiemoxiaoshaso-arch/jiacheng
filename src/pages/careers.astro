@@ -3,6 +3,13 @@ import { getCollection } from 'astro:content'; // 👈 导入内容层读取函�
 import '../styles/global.css';
 import Header from '../components/Header.astro'; 
 
+// 👈 新增：统一处理链接和公开静态资源路径的辅助函数（自动补全 /jiacheng 前缀）
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const resolveUrl = (path: string) => {
+  if (path === '/') return base || '/';
+  return `${base}${path}`;
+};
+
 // 1. 动态拉取 src/content/careers 文件夹下的所有岗位 md 文件
 const rawJobs = await getCollection('careers');
 
@@ -27,8 +34,9 @@ const jobsList = rawJobs.sort((a, b) => {
 
   <!-- 2. 招贤纳士大图 Banner -->
   <section class="relative w-full h-[300px] md:h-[400px] overflow-hidden flex items-center justify-center bg-slate-950 border-b border-slate-200/60">
+    <!-- 背景大图 (使用 resolveUrl 包裹，消除双斜杠隐患) -->
     <img 
-      src={`${import.meta.env.BASE_URL}/images/careers-banner.jpg`}
+      src={resolveUrl('/images/careers-banner.jpg')}
       alt="嘉程招贤纳士" 
       class="absolute inset-0 w-full h-full object-cover opacity-95 hover:scale-[1.02] transition-transform duration-[10000ms] ease-out"
     />
@@ -140,9 +148,10 @@ const jobsList = rawJobs.sort((a, b) => {
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
       <div>© {new Date().getFullYear()} 嘉程新能源股份公司. All rights reserved.</div>
       <div class="flex gap-6">
-        <a href="/" class="hover:text-green-600">首页</a>
-        <a href="/products" class="hover:text-green-600">产品中心</a>
-        <a href="/contact" class="hover:text-green-600">在线留言</a>
+        <!-- 👈 修改：页脚这三个跳转链接使用 resolveUrl 动态包装 -->
+        <a href={resolveUrl('/')} class="hover:text-green-600">首页</a>
+        <a href={resolveUrl('/products')} class="hover:text-green-600">产品中心</a>
+        <a href={resolveUrl('/contact')} class="hover:text-green-600">在线留言</a>
       </div>
     </div>
   </footer>

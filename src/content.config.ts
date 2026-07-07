@@ -1,15 +1,15 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-// 1. 电池产品集合 (增加可选语言限制)
+// 1. 电池产品集合 (修改：采用 schema 函数，启用 image() 图片优化助手)
 const productsCollection = defineCollection({
   loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/products' }), 
-  schema: z.object({
-    lang: z.enum(['zh', 'en']).optional(), // 👈 新增：语言分类，不填默认为 zh 中文
+  schema: ({ image }) => z.object({ // 👈 核心修改：接收 { image } 上下文
+    lang: z.enum(['zh', 'en']).optional(), 
     title: z.string(),
     category: z.string(),
     chemistry: z.string(),
-    image: z.string(), 
+    image: image(), // 👈 核心修改：从 z.string() 变更为 image() 助手
     images: z.array(z.string()).optional(), 
     datasheet: z.string(),
     specs: z.array(z.object({
@@ -19,21 +19,21 @@ const productsCollection = defineCollection({
   }),
 });
 
-// 2. 新闻资讯集合 (增加可选语言限制)
+// 2. 新闻资讯集合 (修改：采用 schema 函数，启用 image() 图片优化助手)
 const newsCollection = defineCollection({
   loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/news' }), 
-  schema: z.object({
-    lang: z.enum(['zh', 'en']).optional(), // 👈 新增：语言分类
+  schema: ({ image }) => z.object({ // 👈 核心修改：接收 { image } 上下文
+    lang: z.enum(['zh', 'en']).optional(), 
     title: z.string(),
     category: z.enum(['corporate', 'industry']), 
     categoryName: z.string(),                   
     date: z.string(),                           
     views: z.string(),                          
-    image: z.string(),                          
+    image: image(), // 👈 核心修改：从 z.string() 变更为 image() 助手
   }),
 });
 
-// 3. 招聘岗位集合
+// 3. 招聘岗位集合 (没有涉及图片前言，保持原样即可)
 const careersCollection = defineCollection({
   loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/careers' }), 
   schema: z.object({

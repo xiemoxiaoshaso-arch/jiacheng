@@ -1,7 +1,15 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets'; // 👈 新增：引入 Astro 官方图片组件
 import '../styles/global.css'; // 👈 引入全局 Tailwind 样式
 import Header from '../components/Header.astro'; // 👈 新增引入导航组件
+
+// 👈 新增：统一处理链接的辅助函数（自动补全项目基础路径 /jiacheng）
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const resolveUrl = (path: string) => {
+  if (path === '/') return base || '/';
+  return `${base}${path}`;
+};
 
 // 动态拉取产品库中的所有电池（展示在首页的“明星产品”板块中）
 const allProducts = await getCollection('products');
@@ -18,7 +26,7 @@ const featuredProducts = allProducts.slice(0, 2);
 <body class="bg-slate-50 text-slate-800">
 
   <!-- 1. 顶部导航栏 -->
-  <Header /> <!-- 👈 直接用这一个标签替代以前那一大段旧导航代码 -->
+  <Header /> 
 
   <!-- 2. 首屏科技感宣誓 (Hero Section) -->
   <section class="relative bg-slate-900 text-white py-24 md:py-32 overflow-hidden">
@@ -38,17 +46,18 @@ const featuredProducts = allProducts.slice(0, 2);
           我们专注于高安全、长寿命磷酸铁锂（LFP）电芯研发与储能系统集成，年产能规划 15 GWh，为全球客户提供一站式定制化动力与储能包方案。
         </p>
         <div class="flex flex-col sm:flex-row gap-4 pt-4">
-          <a href="/products" class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-center font-bold rounded-lg shadow-lg transition-colors">
+          <!-- 👈 修改：使用 resolveUrl 包装链接 -->
+          <a href={resolveUrl('/products')} class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-center font-bold rounded-lg shadow-lg transition-colors">
             浏览产品中心 ➔
           </a>
-          <a href="/contact" class="px-8 py-4 border border-slate-500 hover:border-white text-center font-bold rounded-lg transition-colors">
+          <!-- 👈 修改：使用 resolveUrl 包装链接 -->
+          <a href={resolveUrl('/contact')} class="px-8 py-4 border border-slate-500 hover:border-white text-center font-bold rounded-lg transition-colors">
             获取大货报价
           </a>
         </div>
       </div>
       
-      <!-- 右侧：放置一张高科技感的电池包或工厂渲染图占位 -->
-      <!-- 右侧：玻璃智能监控面板 (色调不变，保持原有的深邃冷色调) -->
+      <!-- 右侧：玻璃智能监控面板 -->
       <div class="lg:col-span-5 flex justify-center">
         <div class="w-full max-w-md bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-800 p-6 shadow-[0_15px_35px_rgba(16,185,129,0.15)] relative">
           <!-- 顶部状态栏与呼吸灯 -->
@@ -122,7 +131,8 @@ const featuredProducts = allProducts.slice(0, 2);
           精选高能量密度电芯与高兼容性储能电池包，提供汽车级（Automotive-Grade）极端工况品质保障。
         </p>
       </div>
-      <a href="/products" class="mt-4 md:mt-0 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-2">
+      <!-- 👈 修改：使用 resolveUrl 包装链接 -->
+      <a href={resolveUrl('/products')} class="mt-4 md:mt-0 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-2">
         前往产品中心（所有型号） ➔
       </a>
     </div>
@@ -140,7 +150,8 @@ const featuredProducts = allProducts.slice(0, 2);
             </div>
             
             <div class="h-56 w-full bg-slate-50 rounded-xl flex items-center justify-center p-6 mb-6 border border-slate-100">
-              <img src={product.data.image} alt={product.data.title} class="max-h-full object-contain" />
+              <!-- 👈 修改：使用 Astro 官方的 <Image /> 组件，并直接把 product.data.image 传给 src -->
+              <Image src={product.data.image} alt={product.data.title} class="max-h-full object-contain" />
             </div>
 
             <h3 class="text-2xl font-bold text-slate-900 mb-3">{product.data.title}</h3>
@@ -159,8 +170,8 @@ const featuredProducts = allProducts.slice(0, 2);
           </div>
 
           <div class="px-8 pb-8 bg-white">
-            <!-- 👈 跳转链接同样使用新的 product.id 变量 -->
-            <a href={`/products/${product.id}`} class="block w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-center text-sm font-bold rounded-xl shadow-sm transition-colors">
+            <!-- 👈 修改：跳转链接同样使用 resolveUrl 包装 -->
+            <a href={resolveUrl(`/products/${product.id}`)} class="block w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-center text-sm font-bold rounded-xl shadow-sm transition-colors">
               查看核心技术参数表 ➔
             </a>
           </div>
@@ -215,9 +226,10 @@ const featuredProducts = allProducts.slice(0, 2);
       <div>
         <h4 class="text-white font-bold text-sm mb-4">产品中心</h4>
         <ul class="space-y-2 text-xs">
-          <li><a href="/products" class="hover:text-white transition-colors">储能系列</a></li>
-          <li><a href="/products" class="hover:text-white transition-colors">动力系列</a></li>
-          <li><a href="/products" class="hover:text-white transition-colors">工业电池组</a></li>
+          <!-- 👈 修改：页脚里的三个产品跳转同样需要用 resolveUrl 包裹 -->
+          <li><a href={resolveUrl('/products')} class="hover:text-white transition-colors">储能系列</a></li>
+          <li><a href={resolveUrl('/products')} class="hover:text-white transition-colors">动力系列</a></li>
+          <li><a href={resolveUrl('/products')} class="hover:text-white transition-colors">工业电池组</a></li>
         </ul>
       </div>
       <div>
@@ -243,7 +255,6 @@ const featuredProducts = allProducts.slice(0, 2);
   </footer>
 
 </body>
-
 
 <!-- ----------------- 🚀 高性能数据波动脚本 ----------------- -->
   <script is:inline>

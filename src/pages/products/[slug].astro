@@ -3,6 +3,25 @@ import { getCollection, render } from 'astro:content';
 import '../../styles/global.css';
 import Header from '../../components/Header.astro'; // 👈 新增引入导航组件（回退两级）
 
+// 👈 新增：统一处理路径和链接补全的辅助函数
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const resolveUrl = (path: string) => {
+  if (!path) return '';
+  if (path.startsWith('http') || path.startsWith('data:')) return path;
+  if (path === '/') return base || '/';
+  return `${base}${path}`;
+};
+
+// 👈 新增：智能判断并获取图片的真实 string 路径（兼容对象与字符串）
+const getUrl = (img: any) => {
+  if (!img) return '';
+  if (typeof img === 'string') {
+    if (img.startsWith('/_astro/') || img.includes(base)) return img;
+    return resolveUrl(img);
+  }
+  return img.src; // Astro 的优化图片对象其 .src 属性已经自带了 /jiacheng 前缀
+};
+
 export async function getStaticPaths() {
   const products = await getCollection('products');
   return products.map(product => ({
@@ -15,14 +34,17 @@ const { product } = Astro.props;
 const { title, category, chemistry, image, datasheet, specs, images } = product.data;
 const { Content } = await render(product);
 
-// 兼容性多图列表
-const galleryImages = images && images.length > 0 ? images : [image];
+// 👈 修改：提取优化后的主图路径和多图列表路径
+const mainImageUrl = getUrl(image);
+const galleryImages = (images && images.length > 0 ? images : [image]).map(img => getUrl(img));
+
+// 👈 修改：处理 PDF 规格书的路径
+const resolvedDatasheet = resolveUrl(datasheet);
 ---
 
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <!-- 👈 同样插入这行代码 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title} - 嘉程新能源</title>
 </head>
@@ -42,12 +64,12 @@ const galleryImages = images && images.length > 0 ? images : [image];
       
       <!-- ================= 左侧卡片 (高度约 670px) ================= -->
       <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center w-full">
-        <!-- 主图显示框 -->
+        <!-- 主图显示框 (使用解析好的主图字符串路径) -->
         <div class="w-full aspect-square bg-slate-50 rounded-xl overflow-hidden flex items-center justify-center p-8 border border-slate-100 relative">
-          <img id="main-product-image" src={image} alt={title} class="max-h-full object-contain transition-all duration-200" />
+          <img id="main-product-image" src={mainImageUrl} alt={title} class="max-h-full object-contain transition-all duration-200" />
         </div>
 
-        <!-- 缩略图滚动条 -->
+        <!-- 缩略图滚动条 (使用解析好的多图数组) -->
         {galleryImages.length > 1 && (
           <div class="flex gap-2.5 mt-4 w-full overflow-x-auto pb-1 scrollbar-none justify-start">
             {galleryImages.map((imgUrl, index) => (
@@ -66,7 +88,7 @@ const galleryImages = images && images.length > 0 ? images : [image];
           📥 下载产品技术规格书 (Datasheet PDF)
         </button>
 
-        <!-- 符合全球准入认证 (精美盾牌徽章墙) -->
+        <!-- 符合全球准入认证 -->
         <div class="w-full mt-6 border-t border-slate-100 pt-6">
           <h4 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4 flex items-center gap-1.5">
             <span class="w-1 h-2.5 bg-emerald-600 rounded-sm"></span>
@@ -116,7 +138,7 @@ const galleryImages = images && images.length > 0 ? images : [image];
         </div>
       </div>
 
-      <!-- ================= 右侧卡片 (高度同步拉升至约 670px，完美与左侧卡片像素级齐平) ================= -->
+      <!-- ================= 右侧卡片 ================= -->
       <div class="lg:col-span-7 bg-white p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between w-full h-full space-y-6">
         <div>
           <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full border border-emerald-100">{chemistry} | {category}</span>
@@ -126,7 +148,7 @@ const galleryImages = images && images.length > 0 ? images : [image];
           </p>
         </div>
 
-        <!-- 📊 核心优化：单列紧凑参数表 (通过 py-3 适度增加行高度，使其完美占满右侧，消融底部落差空隙) -->
+        <!-- 📊 技术参数表 -->
         <div>
           <h2 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-1.5">
             📊 核心技术规格参数 (Specifications)
@@ -136,7 +158,6 @@ const galleryImages = images && images.length > 0 ? images : [image];
               <tbody class="divide-y divide-slate-100">
                 {specs.map((spec, index) => (
                   <tr class={index % 2 === 0 ? 'bg-slate-50/50' : 'bg-white'}>
-                    <!-- 👈 将 py-2 调整为了 py-3 (即上下边距调大4px)，表格完美拉伸对齐 -->
                     <td class="px-5 py-4.5 text-xs font-semibold text-slate-500 w-1/2 border-r border-slate-100">{spec.name}</td>
                     <td class="px-5 py-4.5 text-xs font-bold text-slate-900">{spec.value}</td>
                   </tr>
@@ -152,7 +173,8 @@ const galleryImages = images && images.length > 0 ? images : [image];
             <h3 class="font-bold text-slate-900 text-xs">需要定制或获取大货报价？</h3>
             <p class="text-[11px] text-slate-400">我们的应用工程师可为您提供完整的电池Pack或系统方案。</p>
           </div>
-          <a href="/contact" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition-colors shadow-sm shrink-0">
+          <!-- 👈 修改：使用 resolveUrl 包裹跳转链接 -->
+          <a href={resolveUrl('/contact')} class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition-colors shadow-sm shrink-0">
             联系应用工程师 ➔
           </a>
         </div>
@@ -208,8 +230,8 @@ const galleryImages = images && images.length > 0 ? images : [image];
     </div>
   </div>
 
-  <!-- 控制脚本 -->
-  <script is:inline define:vars={{ datasheet }}>
+  <!-- 控制脚本 (通过 resolvedDatasheet 传入安全的带 base 前缀的路径) -->
+  <script is:inline define:vars={{ datasheet: resolvedDatasheet }}>
     const openBtn = document.getElementById('download-trigger-btn');
     const closeBtn = document.getElementById('close-modal-btn');
     const modal = document.getElementById('pdf-lead-modal');
