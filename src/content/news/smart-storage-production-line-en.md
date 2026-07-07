@@ -1,5 +1,6 @@
 ---
 title: "JC New Energy Phase II 10 GWh Smart Energy Storage Cell Production Line Officially Commissioned"
+lang: "en" 
 category: "corporate"
 categoryName: "Corporate News"
 date: "2026-06-15"

@@ -1,5 +1,6 @@
 ---
 title: "JC New Energy Successfully Passes Annual IATF 16949 Automotive Quality Management Surveillance Audit"
+lang: "en" 
 category: "corporate"
 categoryName: "Corporate News"
 date: "2026-05-20"

@@ -1,5 +1,6 @@
 ---
 title: "2026 Global Commercial & Industrial Energy Storage Forecast: LFP Chemistries Continue to Dominate"
+lang: "en" 
 category: "industry"
 categoryName: "Industry Insights"
 date: "2026-06-08"

@@ -1,10 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets'; // 👈 新增：引入 Astro 官方图片优化组件
+import { Image } from 'astro:assets'; // 👈 引入 Astro 官方图片优化组件
 import '../../styles/global.css'; // 👈 引入样式（相对路径已调整）
 import Header from '../../components/Header.astro'; // 👈 引入通用双语导航（相对路径已调整）
 
-// 👈 新增：统一处理链接的辅助函数（自动补全自定义域名根路径或本地子路径前缀）
+// 👈 统一处理链接的辅助函数（自动补全自定义域名根路径或本地子路径前缀）
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const resolveUrl = (path: string) => {
   if (path === '/') return base || '/';
@@ -14,8 +14,8 @@ const resolveUrl = (path: string) => {
 // 动态拉取产品库中的所有电池
 const allProducts = await getCollection('products');
 
-// 🌟 核心 i18n 逻辑：在英文首页，自动过滤出仅限英文版（lang === 'en'）的明星电池产品卡片
-const englishProducts = allProducts.filter(p => p.data.lang === 'en');
+// 🌟 修改核心逻辑：通过文件名是否包含 '-en' 来拉取英文版明星电池产品卡片
+const englishProducts = allProducts.filter(p => p.id.includes('-en'));
 const featuredProducts = englishProducts.slice(0, 2);
 ---
 
@@ -27,10 +27,8 @@ const featuredProducts = englishProducts.slice(0, 2);
 </head>
 <body class="bg-slate-50 text-slate-800">
 
-  <!-- 1. Universal Smart Header (Will auto-render in English and highlight "Home") -->
   <Header /> 
 
-  <!-- 2. Hero Section (Cinematic Widescreen) -->
   <section class="relative bg-slate-900 text-white py-24 md:py-32 overflow-hidden">
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.15),transparent_50%)]"></div>
     
@@ -47,18 +45,15 @@ const featuredProducts = englishProducts.slice(0, 2);
           We focus on the R&D and system integration of high-safety, long-life Lithium Iron Phosphate (LFP) cells. With a planned annual capacity of 15 GWh, we deliver one-stop customized power & ESS solutions.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 pt-4">
-          <!-- 👈 修改：使用 resolveUrl 包装跳转链接 -->
           <a href={resolveUrl('/en/products')} class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-center font-bold rounded-lg shadow-lg transition-colors">
             Browse Products ➔
           </a>
-          <!-- 👈 修改：使用 resolveUrl 包装跳转链接 -->
           <a href={resolveUrl('/en/contact')} class="px-8 py-4 border border-slate-500 hover:border-white text-center font-bold rounded-lg transition-colors">
             Get Bulk Quote
           </a>
         </div>
       </div>
       
-      <!-- Right Side: Dark Glass Monitoring Panel Simulator (色调不变) -->
       <div class="lg:col-span-5 flex justify-center">
         <div class="w-full max-w-md bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-800 p-6 shadow-[0_15px_35px_rgba(16,185,129,0.15)] relative">
           <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-4">
@@ -97,7 +92,6 @@ const featuredProducts = englishProducts.slice(0, 2);
     </div>
   </section>
 
-  <!-- 3. Key Statistics Board -->
   <section class="max-w-7xl mx-auto px-6 -mt-12 relative z-20">
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
@@ -119,7 +113,6 @@ const featuredProducts = englishProducts.slice(0, 2);
     </div>
   </section>
 
-  <!-- 4. Dynamic Featured Products Block (i18n Filtered) -->
   <section class="max-w-7xl mx-auto px-6 py-20 bg-slate-100/50 rounded-3xl my-12 border border-slate-200/40">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
       <div>
@@ -129,17 +122,15 @@ const featuredProducts = englishProducts.slice(0, 2);
           Selected high energy density cells and highly compatible energy storage packs with automotive-grade quality assurance.
         </p>
       </div>
-      <!-- 👈 修改：使用 resolveUrl 包装跳转链接 -->
       <a href={resolveUrl('/en/products')} class="mt-4 md:mt-0 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-2">
         All Products ➔
       </a>
     </div>
 
-    <!-- Loop English Products -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       {featuredProducts.length === 0 ? (
         <div class="col-span-2 text-center py-12 text-slate-400 text-sm">
-          No English products found. Please add a product with "lang: 'en'" in its frontmatter to show here.
+          No English products found. Please add a product file named with "-en" suffix to show here.
         </div>
       ) : (
         featuredProducts.map(product => (
@@ -153,7 +144,6 @@ const featuredProducts = englishProducts.slice(0, 2);
               </div>
               
               <div class="h-56 w-full bg-slate-50 rounded-xl flex items-center justify-center p-6 mb-6 border border-slate-100">
-                <!-- 👈 修改：改用 Astro 官方的 <Image /> 优化组件，自动适配打包流 -->
                 <Image src={product.data.image} alt={product.data.title} class="max-h-full object-contain" />
               </div>
 
@@ -176,7 +166,6 @@ const featuredProducts = englishProducts.slice(0, 2);
             </div>
 
             <div class="px-8 pb-8 bg-white">
-              <!-- 👈 修改：使用 resolveUrl 包装详情跳转 -->
               <a href={resolveUrl(`/en/products/${product.id}`)} class="block w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-center text-sm font-bold rounded-xl shadow-sm transition-colors">
                 View Specifications ➔
               </a>
@@ -187,7 +176,6 @@ const featuredProducts = englishProducts.slice(0, 2);
     </div>
   </section>
 
-  <!-- 5. Manufacturing & Quality Excellence -->
   <section class="bg-slate-900 text-white py-20">
     <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
       <div class="lg:col-span-6 space-y-6">
@@ -223,7 +211,6 @@ const featuredProducts = englishProducts.slice(0, 2);
     </div>
   </section>
 
-  <!-- 6. Footer (Dynamic & Balanced) -->
   <footer class="bg-slate-950 text-slate-500 py-12 px-6 border-t border-slate-900">
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
       <div class="space-y-4">
@@ -233,7 +220,6 @@ const featuredProducts = englishProducts.slice(0, 2);
       <div>
         <h4 class="text-white font-bold text-sm mb-4">Product Center</h4>
         <ul class="space-y-2 text-xs">
-          <!-- 👈 修改：页脚里的三个跳转链接同样需要用 resolveUrl 包裹 -->
           <li><a href={resolveUrl('/en/products')} class="hover:text-white transition-colors">ESS Batteries</a></li>
           <li><a href={resolveUrl('/en/products')} class="hover:text-white transition-colors">E-Mobility series</a></li>
           <li><a href={resolveUrl('/en/products')} class="hover:text-white transition-colors">Industrial Packs</a></li>
@@ -263,7 +249,6 @@ const featuredProducts = englishProducts.slice(0, 2);
 
 </body>
 
-<!-- ----------------- 🚀 Real-time Battery Metric Simulation Script ----------------- -->
 <script is:inline>
   const vEl = document.getElementById('live-voltage');
   const tEl = document.getElementById('live-temp');
@@ -278,5 +263,4 @@ const featuredProducts = englishProducts.slice(0, 2);
     }, 2000);
   }
 </script>
-
 </html>
