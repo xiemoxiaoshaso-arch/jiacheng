@@ -35,16 +35,24 @@ const featuredProducts = zhProducts.slice(0, 2);
     
     <!-- 背景大图与遮罩叠加层 -->
     <div class="absolute inset-0 z-0 select-none pointer-events-none">
+      <!-- 
+        1. 提高不透明度至 opacity-50 
+        2. 移除了过暗的滤镜，确保图片清晰显现
+      -->
       <img 
-        src="https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1920&q=80" 
+        src="{resolveUrl('/images/hero-bg.jpg')}" 
         alt="新能源科技背景" 
-        class="w-full h-full object-cover opacity-20 filter brightness-75 contrast-110" 
+        class="w-full h-full object-cover opacity-50" 
         loading="eager"
       />
-      <!-- 渐变阴影面罩，确保左侧白色文字拥有极高对比度 -->
-      <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-900/30"></div>
-      <!-- 绿色科技感径向高亮 -->
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(16,185,129,0.25),transparent_60%)]"></div>
+      <!-- 
+        优化渐变遮罩：
+        - 左侧白色文字区依然有暗色遮罩保护 (from-slate-950/95)
+        - 中右侧迅速过渡为透明 (to-transparent)，使背景大图完全显露
+      -->
+      <div class="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/40 to-transparent"></div>
+      <!-- 绿色径向高亮光晕 -->
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.3),transparent_50%)]"></div>
     </div>
     
     <!-- 轮播内容容器 (带 z-10) -->
@@ -396,7 +404,7 @@ const featuredProducts = zhProducts.slice(0, 2);
   }
 </style>
 
-<!-- 轮播控制脚本与数据监控模拟 -->
+<!-- 轮播控制脚本与第一屏电芯数据监控模拟 -->
 <script is:inline>
   // --- 1. 轮播图控制逻辑 ---
   const slides = document.querySelectorAll('.carousel-slide');
@@ -409,28 +417,23 @@ const featuredProducts = zhProducts.slice(0, 2);
   const cycleInterval = 6000; // 每 6 秒切换一次
 
   function updateCarousel(index) {
-    // 处理越界索引
     if (index >= slides.length) currentSlide = 0;
     else if (index < 0) currentSlide = slides.length - 1;
     else currentSlide = index;
 
-    // 隐藏所有幻灯片
     slides.forEach((slide) => {
       slide.classList.add('hidden');
       slide.classList.remove('active');
     });
 
-    // 清理并更新 Dots 指示器
     dots.forEach((dot) => {
       dot.classList.remove('bg-emerald-500', 'w-6');
       dot.classList.add('bg-slate-600', 'w-3');
     });
 
-    // 激活当前幻灯片
     slides[currentSlide].classList.remove('hidden');
     slides[currentSlide].classList.add('active');
 
-    // 激活对应的 Dot 指示器并实现拉伸效果
     dots[currentSlide].classList.add('bg-emerald-500', 'w-6');
     dots[currentSlide].classList.remove('bg-slate-600', 'w-3');
   }
@@ -446,15 +449,13 @@ const featuredProducts = zhProducts.slice(0, 2);
     if (autoPlayTimer) clearInterval(autoPlayTimer);
   }
 
-  // 点击左侧按钮
   if (prevBtn) {
     prevBtn.addEventListener('click', () => {
       updateCarousel(currentSlide - 1);
-      startAutoPlay(); // 用户操作后重置定时器
+      startAutoPlay();
     });
   }
 
-  // 点击右侧按钮
   if (nextBtn) {
     nextBtn.addEventListener('click', () => {
       updateCarousel(currentSlide + 1);
@@ -462,7 +463,6 @@ const featuredProducts = zhProducts.slice(0, 2);
     });
   }
 
-  // 进度指示器点击事件
   dots.forEach((dot, index) => {
     dot.addEventListener('click', () => {
       updateCarousel(index);
@@ -470,61 +470,30 @@ const featuredProducts = zhProducts.slice(0, 2);
     });
   });
 
-  // 鼠标悬停时暂停自动播放，离开后恢复，改善用户体验
   const heroSection = document.querySelector('section');
   if (heroSection) {
     heroSection.addEventListener('mouseenter', stopAutoPlay);
     heroSection.addEventListener('mouseleave', startAutoPlay);
   }
 
-  // 初始化轮播
   updateCarousel(0);
   startAutoPlay();
 
-  // --- 2. 模拟数据监控波动面板逻辑 ---
-  // Slide 1 电芯元素
+  // --- 2. 模拟数据监控波动面板逻辑（仅服务于第一屏保留的仪表盘） ---
   const vEl = document.getElementById('live-voltage');
   const tEl = document.getElementById('live-temp');
   
-  // Slide 2 储能系统元素
-  const pvEl = document.getElementById('ess-pv');
-  const chargeEl = document.getElementById('ess-charge');
-  const socEl = document.getElementById('ess-soc');
-
-  // Slide 3 MES系统元素
-  const moistEl = document.getElementById('mes-moisture');
-  const yieldEl = document.getElementById('mes-yield');
-
-  setInterval(() => {
-    // 1. 电芯电压在高频波动
-    if (vEl && tEl) {
+  if (vEl && tEl) {
+    setInterval(() => {
+      // 电压在 3.280V ~ 3.288V 之间高频波动
       const fakeVoltage = (3.280 + Math.random() * 0.008).toFixed(3);
       vEl.textContent = `${fakeVoltage} V`;
+      
+      // 温度在 25.1℃ ~ 25.5℃ 之间平滑微动
       const fakeTemp = (25.1 + Math.random() * 0.4).toFixed(1);
       tEl.textContent = `${fakeTemp} ℃`;
-    }
-
-    // 2. 储能功率及SOC模拟波动
-    if (pvEl && chargeEl && socEl) {
-      const fakePv = (43.5 + Math.random() * 4.2).toFixed(1);
-      pvEl.textContent = `${fakePv} kW`;
-      const fakeCharge = (33.0 + Math.random() * 3.5).toFixed(1);
-      chargeEl.textContent = `${fakeCharge} kW`;
-      
-      let currentSoc = parseFloat(socEl.textContent) || 82.5;
-      currentSoc = (currentSoc + (Math.random() * 0.015)).toFixed(2);
-      if (currentSoc > 100) currentSoc = 80.0; // 模拟周期闭环
-      socEl.textContent = `${currentSoc} %`;
-    }
-
-    // 3. MES水分与合格率细微波动
-    if (moistEl && yieldEl) {
-      const fakeMoist = Math.floor(25 + Math.random() * 6);
-      moistEl.textContent = `${fakeMoist} ppm`;
-      const fakeYield = (99.80 + Math.random() * 0.04).toFixed(2);
-      yieldEl.textContent = `${fakeYield} %`;
-    }
-  }, 2000);
+    }, 2000);
+  }
 </script>
 
 </html>
