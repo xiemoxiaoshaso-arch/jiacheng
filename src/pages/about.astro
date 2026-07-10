@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets'; // 👈 导入 Astro 原生图片优化组件
+import { Image } from 'astro:assets'; // 导入 Astro 原生图片优化组件
 import '../styles/global.css';
 import Header from '../components/Header.astro'; 
 
@@ -10,8 +10,14 @@ const resolveUrl = (path: string) => {
   return `${base}${path}`;
 };
 
-// 👈 推荐做法：将 Banner 图片放入 src/assets 目录下，享受原生全自动无损压缩与分辨率自适应
+// 👈 导入首屏 Banner 本地大图
 import aboutBanner from '../assets/images/about-banner.jpg'; 
+
+// 👈 将 4 张高精车间实景图存入 src/assets/images/ 文件夹下，交给 Astro 自动进行 WebP 压缩与尺寸适配
+import workshop1 from '../assets/images/workshop-1.jpg'; 
+import workshop2 from '../assets/images/workshop-2.jpg'; 
+import workshop3 from '../assets/images/workshop-3.jpg'; 
+import workshop4 from '../assets/images/workshop-4.jpg'; 
 ---
 
 <html lang="zh-CN">
@@ -27,7 +33,6 @@ import aboutBanner from '../assets/images/about-banner.jpg';
 
   <!-- 2. 关于我们 Banner 区域 -->
   <section class="relative w-full h-[300px] md:h-[400px] overflow-hidden flex items-center justify-center bg-slate-950 border-b border-slate-200/60">
-    <!-- 👈 修改：改用原生 Image 组件，保障 Banner 的首屏加载与渲染性能 -->
     <Image 
       src={aboutBanner}
       alt="嘉程新能源智造基地" 
@@ -37,7 +42,7 @@ import aboutBanner from '../assets/images/about-banner.jpg';
       class="absolute inset-0 w-full h-full object-cover opacity-95 hover:scale-[1.02] transition-transform duration-[10000ms] ease-out"
     />
     
-    <!-- 背景遮罩与渐变滤镜，增强文字视觉可读性 -->
+    <!-- 背景遮罩与渐变滤镜 -->
     <div class="absolute inset-0 bg-slate-950/35 pointer-events-none"></div>
     <div class="absolute inset-0 bg-gradient-to-tr from-green-500/10 via-transparent to-blue-500/10 pointer-events-none"></div>
     <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/30 to-transparent pointer-events-none"></div>
@@ -65,36 +70,130 @@ import aboutBanner from '../assets/images/about-banner.jpg';
     </div>
   </section>
 
-  <!-- 4. 企业实力数据看板 -->
-  <section class="w-full bg-slate-100 py-20 border-b border-slate-200 reveal-section opacity-0 translate-y-8 transition-all duration-1000">
+  <!-- 
+    4. 【核心重构区】实力双视图滑动看板区
+    - 智造车间默认作为第一页高亮加载，数据看板作为第二页
+  -->
+  <section class="w-full bg-slate-100 py-5 border-b border-slate-200 reveal-section opacity-0 translate-y-8 transition-all duration-1000 overflow-hidden relative">
     <div class="max-w-7xl mx-auto px-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
-          <div class="text-3xl font-extrabold text-emerald-600 font-mono">150,000 ㎡</div>
-          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">智造基地占地面积</div>
-          <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">拥有高度自动化、万级洁净度的现代化绿色生产车间。</p>
+      
+      <!-- 双视图顶部滑动切换控制栏 -->
+      <div class="flex justify-between items-center mb-8 pb-4 border-b border-slate-200/80">
+        <div>
+          <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase font-mono">Our Capabilities</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-1">企业综合实力</h2>
         </div>
-
-        <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
-          <div class="text-3xl font-extrabold text-emerald-600 font-mono">15 GWh</div>
-          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">规划产能规模</div>
-          <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">全面导入工业4.0设备与智能化MES制造全流程追溯系统。</p>
+        <!-- 
+          精美选项卡 (Tabs)：
+          - 默认高亮“🏭 智造车间”按钮
+        -->
+        <div class="flex bg-slate-200 p-1 rounded-xl">
+          <button id="tab-workshops" class="px-5 py-2 text-xs font-bold rounded-lg bg-white text-slate-900 shadow-sm transition-all duration-300 focus:outline-none">
+            🏭 智造车间
+          </button>
+          <button id="tab-stats" class="px-5 py-2 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-900 transition-all duration-300 focus:outline-none">
+            📊 数据看板
+          </button>
         </div>
-
-        <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
-          <div class="text-3xl font-extrabold text-emerald-600 font-mono">200+ 人</div>
-          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">核心研发与技术团队</div>
-          <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">核心技术团队来自业内顶尖科研院所，自主攻克多项核心技术。</p>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
-          <div class="text-3xl font-extrabold text-emerald-600 font-mono">180+ 项</div>
-          <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">发明与实用专利</div>
-          <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">在材料改性、极片涂布、BMS智控等领域拥有核心知识产权。</p>
-        </div>
-
       </div>
+
+      <!-- 双滑轨视图主体 (宽度为双倍 200%) -->
+      <div class="w-full overflow-hidden relative">
+        <div class="flex transition-transform duration-700 ease-in-out w-[200%]" id="strength-track">
+          
+          <!-- 【视图一（默认首屏）】：4张智造车间缩略图集 -->
+          <div class="w-1/2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-1 flex-shrink-0">
+            
+            <!-- 缩略图卡片 1 -->
+            <button 
+              class="workshop-btn bg-white rounded-2xl border border-slate-300 shadow-sm hover:shadow-md hover:border-emerald-500/40 p-3 text-left transition-all group overflow-hidden focus:outline-none"
+              data-img-url={workshop1.src}
+            >
+              <div class="w-full h-36 rounded-xl overflow-hidden relative mb-4">
+                <Image src={workshop1} alt="万级无尘涂布车间" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div class="absolute inset-0 bg-slate-950/20 group-hover:bg-transparent transition-colors"></div>
+              </div>
+              <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-emerald-600 transition-colors">万级无尘涂布车间</h3>
+              <p class="text-[11px] text-slate-400 mt-0.5">Class-10000 Cleanroom</p>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed">配置高精密进口涂布机，严控水分温控，奠定安全品质最关键根基。</p>
+            </button>
+
+            <!-- 缩略图卡片 2 -->
+            <button 
+              class="workshop-btn bg-white rounded-2xl border border-slate-300 shadow-sm hover:shadow-md hover:border-emerald-500/40 p-3 text-left transition-all group overflow-hidden focus:outline-none"
+              data-img-url={workshop2.src}
+            >
+              <div class="w-full h-36 rounded-xl overflow-hidden relative mb-4">
+                <Image src={workshop2} alt="全自动卷绕装配线" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div class="absolute inset-0 bg-slate-950/20 group-hover:bg-transparent transition-colors"></div>
+              </div>
+              <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-emerald-600 transition-colors">全自动卷绕装配线</h3>
+              <p class="text-[11px] text-slate-400 mt-0.5">Automated Assembly Line</p>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed">全流程MES系统智能在线追溯，激光极耳焊接，实现电芯极致一致性。</p>
+            </button>
+
+            <!-- 缩略图卡片 3 -->
+            <button 
+              class="workshop-btn bg-white rounded-2xl border border-slate-300 shadow-sm hover:shadow-md hover:border-emerald-500/40 p-3 text-left transition-all group overflow-hidden focus:outline-none"
+              data-img-url={workshop3.src}
+            >
+              <div class="w-full h-36 rounded-xl overflow-hidden relative mb-4">
+                <Image src={workshop3} alt="智能PACK集成化车间" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div class="absolute inset-0 bg-slate-950/20 group-hover:bg-transparent transition-colors"></div>
+              </div>
+              <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-emerald-600 transition-colors">智能PACK集成化车间</h3>
+              <p class="text-[11px] text-slate-400 mt-0.5">Battery PACK Facility</p>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed">柔性模块化自动化装配线，出厂前进行100%高保真系统级测试。</p>
+            </button>
+
+            <!-- 缩略图卡片 4 -->
+            <button 
+              class="workshop-btn bg-white rounded-2xl border border-slate-300 shadow-sm hover:shadow-md hover:border-emerald-500/40 p-3 text-left transition-all group overflow-hidden focus:outline-none"
+              data-img-url={workshop4.src}
+            >
+              <div class="w-full h-36 rounded-xl overflow-hidden relative mb-4">
+                <Image src={workshop4} alt="CNAS国家联合测试实验室" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div class="absolute inset-0 bg-slate-950/20 group-hover:bg-transparent transition-colors"></div>
+              </div>
+              <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-emerald-600 transition-colors">CNAS国家联合实验室</h3>
+              <p class="text-[11px] text-slate-400 mt-0.5">CNAS Accredited Lab</p>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed">配置完备的材料分析仪与针刺、过充、极端温控环境无损评测舱。</p>
+            </button>
+
+          </div>
+
+          <!-- 【视图二（滑动显示）】：4张核心实力数据卡片 -->
+          <div class="w-1/2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-1 flex-shrink-0">
+            
+            <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
+              <div class="text-3xl font-extrabold text-emerald-600 font-mono">150,000 ㎡</div>
+              <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">智造基地占地面积</div>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">拥有高度自动化、万级洁净度的现代化绿色生产车间。</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
+              <div class="text-3xl font-extrabold text-emerald-600 font-mono">15 GWh</div>
+              <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">规划产能规模</div>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">全面导入工业4.0设备与智能化MES制造全流程追溯系统。</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
+              <div class="text-3xl font-extrabold text-emerald-600 font-mono">200+ 人</div>
+              <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">核心研发与技术团队</div>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">核心技术团队来自业内顶尖科研院所，自主攻克多项核心技术。</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-sm text-center md:text-left hover:shadow-md transition-all">
+              <div class="text-3xl font-extrabold text-emerald-600 font-mono">180+ 项</div>
+              <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-wider font-sans">发明与实用专利</div>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed font-sans">在材料改性、极片涂布、BMS智控等领域拥有核心知识产权。</p>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -241,22 +340,107 @@ import aboutBanner from '../assets/images/about-banner.jpg';
     </div>
   </footer>
 
-  <!-- 滚动渐入控制脚本 -->
-  <script is:inline>
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.remove('opacity-0', 'translate-y-8');
-          entry.target.classList.add('opacity-100', 'translate-y-0');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal-section').forEach(section => {
-      revealObserver.observe(section);
-    });
-  </script>
+  <!-- 8. 灯箱大图弹窗组件 (Lightbox Modal) -->
+  <div id="lightbox-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 backdrop-blur-md p-4">
+    <div class="relative max-w-4xl w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-4 md:p-6 shadow-[0_20px_50px_rgba(16,185,129,0.15)] animate-fade-in">
+      <!-- 关闭按钮 -->
+      <button id="close-lightbox" class="absolute -top-14 right-0 md:top-6 md:right-6 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-800 p-2.5 rounded-full border border-slate-800 transition-colors focus:outline-none" aria-label="关闭预览">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <!-- 高清展示大图 -->
+      <div class="flex items-center justify-center min-h-[300px] max-h-[70vh] overflow-hidden">
+        <img id="lightbox-img" src="" alt="厂房车间预览" class="max-h-[70vh] max-w-full object-contain rounded-2xl shadow-2xl transition-transform duration-300" />
+      </div>
+    </div>
+  </div>
 
 </body>
+
+<!-- 滚动渐入控制脚本 -->
+<script is:inline>
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.remove('opacity-0', 'translate-y-8');
+        entry.target.classList.add('opacity-100', 'translate-y-0');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal-section').forEach(section => {
+    revealObserver.observe(section);
+  });
+
+  // --- 【修改 1】：滑动轨切换逻辑（将 🏭 智造车间 作为默认第一页，即平移 0%） ---
+  const tabStats = document.getElementById('tab-stats');
+  const tabWorkshops = document.getElementById('tab-workshops');
+  const strengthTrack = document.getElementById('strength-track');
+
+  if (tabStats && tabWorkshops && strengthTrack) {
+    // 🏭 智造车间 作为第一页，点击回到 0%
+    tabWorkshops.addEventListener('click', () => {
+      strengthTrack.style.transform = 'translateX(0%)';
+      tabWorkshops.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+      tabWorkshops.classList.remove('text-slate-500');
+      tabStats.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+      tabStats.classList.add('text-slate-500');
+    });
+
+    // 📊 数据看板 作为第二页，点击平移到 -50%
+    tabStats.addEventListener('click', () => {
+      strengthTrack.style.transform = 'translateX(-50%)';
+      tabStats.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+      tabStats.classList.remove('text-slate-500');
+      tabWorkshops.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+      tabWorkshops.classList.add('text-slate-500');
+    });
+  }
+
+  // --- 【修改 2】：车间实景大图弹窗 (Lightbox) 控制逻辑 ---
+  const lightboxModal = document.getElementById('lightbox-modal');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const closeLightboxBtn = document.getElementById('close-lightbox');
+  const workshopBtns = document.querySelectorAll('.workshop-btn');
+
+  workshopBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const fullImgUrl = btn.getAttribute('data-img-url');
+      if (fullImgUrl && lightboxModal && lightboxImg) {
+        lightboxImg.src = fullImgUrl;
+        lightboxModal.classList.remove('hidden');
+        lightboxModal.classList.add('flex');
+      }
+    });
+  });
+
+  function closeLightbox() {
+    if (lightboxModal) {
+      lightboxModal.classList.add('hidden');
+      lightboxModal.classList.remove('flex');
+    }
+  }
+
+  if (closeLightboxBtn) {
+    closeLightboxBtn.addEventListener('click', closeLightbox);
+  }
+
+  if (lightboxModal) {
+    lightboxModal.addEventListener('click', (e) => {
+      if (e.target === lightboxModal) {
+        closeLightbox();
+      }
+    });
+  }
+
+  // 监听键盘 ESC 键关闭
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeLightbox();
+    }
+  });
+</script>
+
 </html>

@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets'; // 导入 Astro 原生图片优化组件
+import { Image } from 'astro:assets'; // 👈 导入 Astro 核心图片优化组件
 import '../styles/global.css'; 
 import Header from '../components/Header.astro'; 
 
@@ -17,6 +17,12 @@ const zhProducts = allProducts.filter(product => product.data.lang === 'zh');
 
 // 2. 挑选前两款作为首页的“明星产品”展示
 const featuredProducts = zhProducts.slice(0, 2);
+
+// 3. 读取并精准筛选中文 Banner，按 order 升序排序
+const allBanners = await getCollection('banners');
+const zhBanners = allBanners
+  .filter(banner => banner.data.lang === 'zh')
+  .sort((a, b) => a.data.order - b.data.order);
 ---
 
 <html lang="zh-CN">
@@ -31,202 +37,136 @@ const featuredProducts = zhProducts.slice(0, 2);
   <Header /> 
 
   <!-- 2. 首屏 Hero 轮播区域 -->
-  <section class="relative bg-slate-950 text-white overflow-hidden min-h-[620px] sm:min-h-[550px] lg:min-h-[500px] flex items-center">
+  <section class="relative bg-slate-950 text-white overflow-hidden h-[calc(100vh-80px)] min-h-[620px] flex items-center">
     
-    <!-- 背景大图与遮罩叠加层 -->
-    <div class="absolute inset-0 z-0 select-none pointer-events-none">
-      <!-- 
-        1. 提高不透明度至 opacity-50 
-        2. 移除了过暗的滤镜，确保图片清晰显现
-      -->
-      <img 
-        src={resolveUrl('/images/hero-bg.jpg')}
-        alt="新能源科技背景" 
-        class="w-full h-full object-cover opacity-50" 
-        loading="eager"
-      />
-      <!-- 
-        优化渐变遮罩：
-        - 左侧白色文字区依然有暗色遮罩保护 (from-slate-950/95)
-        - 中右侧迅速过渡为透明 (to-transparent)，使背景大图完全显露
-      -->
-      <div class="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/40 to-transparent"></div>
-      <!-- 绿色径向高亮光晕 -->
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.3),transparent_50%)]"></div>
-    </div>
-    
-    <!-- 轮播内容容器 (带 z-10) -->
-    <div class="w-full py-20 md:py-28 relative z-10">
-      
-      <!-- Slide 1: 磷酸铁锂电芯 (保留原样：含有实时仪表盘) -->
-      <div class="carousel-slide grid grid-cols-1 lg:grid-cols-12 gap-12 items-center max-w-7xl mx-auto px-6 active">
-        <div class="lg:col-span-7 space-y-6">
-          <span class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-500/20">
-            工业级 & 储能级锂电池方案专家
-          </span>
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-            驱动绿色未来，<br />
-            以安全与品质定义新能源
-          </h1>
-          <p class="text-slate-300 text-base md:text-lg max-w-xl">
-            我们专注于高安全、长寿命磷酸铁锂（LFP）电芯研发与储能系统集成，年产能规划 15 GWh，为全球客户提供一站式定制化动力与储能包方案。
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 pt-4">
-            <a href={resolveUrl('/products')} class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-center font-bold rounded-lg shadow-lg transition-colors">
-              浏览产品中心 ➔
-            </a>
-            <a href={resolveUrl('/contact')} class="px-8 py-4 border border-slate-500 hover:border-white text-center font-bold rounded-lg transition-colors">
-              获取大货报价
-            </a>
-          </div>
-        </div>
+    <!-- 轮播幻灯片主容器 -->
+    <div class="absolute inset-0 w-full h-full">
+      {zhBanners.map((banner, index) => {
+        const isFirst = index === 0;
+        const { 
+          badge, 
+          badgeColor, 
+          title, 
+          subtitle, 
+          description, 
+          bgImage, 
+          ctaText1, 
+          ctaLink1, 
+          ctaText2, 
+          ctaLink2, 
+          gallery 
+        } = banner.data;
         
-        <!-- 右侧：电芯实时监控仪表盘 (保留) -->
-        <div class="lg:col-span-5 flex justify-center">
-          <div class="w-full max-w-md bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-800 p-6 shadow-[0_15px_35px_rgba(16,185,129,0.15)] relative min-h-[340px] flex flex-col justify-between">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-4">
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                <span class="text-[11px] font-bold tracking-widest text-emerald-400 uppercase font-mono">SYS MONITOR // LIVE_CELL</span>
-              </div>
-              <span class="text-[10px] text-slate-500 font-mono">ID: LFP_CELL_280AH</span>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
-                <div class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">电芯工作电压</div>
-                <div class="text-2xl font-extrabold text-emerald-400 font-mono mt-1" id="live-voltage">3.284 V</div>
-              </div>
-              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
-                <div class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">实时工作温度</div>
-                <div class="text-2xl font-extrabold text-cyan-400 font-mono mt-1" id="live-temp">25.3 ℃</div>
-              </div>
-              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
-                <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">荷电状态 (SOC)</div>
-                <div class="text-2xl font-extrabold text-white font-mono mt-1">98.2 %</div>
-              </div>
-              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
-                <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">健康度 (SOH)</div>
-                <div class="text-2xl font-extrabold text-white font-mono mt-1">100.0 %</div>
-              </div>
-            </div>
-
-            <div class="mt-4 p-3 bg-slate-950 rounded-lg border border-slate-800/80 text-center flex items-center justify-between text-xs font-mono text-slate-400">
-              <span>压力/排气监测:</span>
-              <span class="text-emerald-400 font-bold">NORMAL 🟢</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 2: 全场景储能解决方案 (右侧改成了精美的储能产品图) -->
-      <div class="carousel-slide grid grid-cols-1 lg:grid-cols-12 gap-12 items-center max-w-7xl mx-auto px-6 hidden">
-        <div class="lg:col-span-7 space-y-6">
-          <span class="inline-block px-3 py-1 bg-blue-500/10 text-blue-400 text-xs font-semibold rounded-full border border-blue-500/20">
-            工商业 & 户用储能系统集成
-          </span>
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-            智慧储能系统，<br />
-            全天候守护您的零碳电力
-          </h1>
-          <p class="text-slate-300 text-base md:text-lg max-w-xl">
-            提供涵盖高效率集装箱液冷储能、工商业分布式储能柜、以及家庭堆叠式高压电池包，无缝兼容主流逆变器，实现峰谷套利与安全备电。
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 pt-4">
-            <a href={resolveUrl('/products')} class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-center font-bold rounded-lg shadow-lg transition-colors">
-              探索储能产品 ➔
-            </a>
-            <a href={resolveUrl('/contact')} class="px-8 py-4 border border-slate-500 hover:border-white text-center font-bold rounded-lg transition-colors">
-              索取定制方案
-            </a>
-          </div>
-        </div>
+        // 动态计算配色主题
+        let badgeClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+        let glowClass = "bg-[radial-gradient(circle_at_25%_35%,rgba(16,185,129,0.15),transparent_60%)]";
+        let rightGlowClass = "from-emerald-500 to-teal-500";
         
-        <!-- 右侧：展示储能柜产品大图 (带微光环绕，与仪表盘等高) -->
-        <div class="lg:col-span-5 flex justify-center">
-          <div class="relative w-full max-w-md group">
-            <!-- 背后微弱发光环绕特效 -->
-            <div class="absolute -inset-1 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl blur opacity-20 group-hover:opacity-35 transition duration-700"></div>
-            <!-- 图片展示容器 (保持与仪表盘相同的 min-h) -->
-            <div class="relative bg-slate-900/70 backdrop-blur-md rounded-2xl border border-slate-800/80 p-6 flex items-center justify-center min-h-[340px] shadow-2xl">
-              <!-- 
-                这里默认展示一张高质量工业储能设备图占位（暗底更显科技感）。
-                您可以将其修改为您的本地储能系统产品PNG透明图：src={resolveUrl('/images/ess-product.png')}
-              -->
-              <img 
-                src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=600&q=80" 
-                alt="工商业分布式液冷储能柜" 
-                class="max-h-[290px] object-contain rounded-xl transition-transform duration-500 group-hover:scale-105" 
+        if (badgeColor === 'blue') {
+          badgeClass = "bg-blue-500/10 text-blue-400 border-blue-500/20";
+          glowClass = "bg-[radial-gradient(circle_at_25%_35%,rgba(59,130,246,0.15),transparent_60%)]";
+          rightGlowClass = "from-blue-500 to-emerald-500";
+        } else if (badgeColor === 'cyan') {
+          badgeClass = "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
+          glowClass = "bg-[radial-gradient(circle_at_25%_35%,rgba(34,211,238,0.15),transparent_60%)]";
+          rightGlowClass = "from-cyan-500 to-blue-500";
+        }
+
+        return (
+          <div class={`carousel-slide absolute inset-0 w-full h-full flex items-center ${isFirst ? 'active z-10' : 'hidden z-0'}`}>
+            <!-- 背景大图层 (👈 核心修改 1：改用 Astro 原生 Image 组件，渲染被 image() 解析优化后的对象) -->
+            <!-- 背景大图层 (👈 彻底去除任何变暗遮罩、滤镜和不透明度，100% 完美还原您原图的真实亮度和鲜艳色彩) -->
+            <div class="absolute inset-0 z-0 select-none pointer-events-none w-full h-full">
+              <Image 
+                src={bgImage} 
+                alt={`${title}背景`} 
+                class="w-full h-full object-cover" 
+                loading={isFirst ? "eager" : "lazy"}
+                inferSize={true}
               />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 3: 智造品控与体系 (右侧改成了高端动力电池包/电芯产品图) -->
-      <div class="carousel-slide grid grid-cols-1 lg:grid-cols-12 gap-12 items-center max-w-7xl mx-auto px-6 hidden">
-        <div class="lg:col-span-7 space-y-6">
-          <span class="inline-block px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/20">
-            智造车间 & IATF 16949 体系
-          </span>
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-            汽车级智能制造，<br />
-            以精密工艺成就极致安全
-          </h1>
-          <p class="text-slate-300 text-base md:text-lg max-w-xl">
-            全线引进全自动化 MES 追溯系统与万级无尘控制标准，出厂电芯历经 100% 超声波无损探伤、充放电及 X-ray 质检，杜绝安全隐患。
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 pt-4">
-            <a href={resolveUrl('/contact')} class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-center font-bold rounded-lg shadow-lg transition-colors">
-              预约实地厂区视频 ➔
-            </a>
-            <a href={resolveUrl('/contact')} class="px-8 py-4 border border-slate-500 hover:border-white text-center font-bold rounded-lg transition-colors">
-              获取质量认证报告
-            </a>
-          </div>
-        </div>
-        
-        <!-- 右侧：展示高端电芯/动力包产品大图 -->
-        <div class="lg:col-span-5 flex justify-center">
-          <div class="relative w-full max-w-md group">
-            <!-- 背后微弱发光环绕特效 -->
-            <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl blur opacity-20 group-hover:opacity-35 transition duration-700"></div>
-            <!-- 图片展示容器 (保持与仪表盘相同的 min-h) -->
-            <div class="relative bg-slate-900/70 backdrop-blur-md rounded-2xl border border-slate-800/80 p-6 flex items-center justify-center min-h-[340px] shadow-2xl">
               <!-- 
-                这里默认展示一张高质量动力电池包/先进电芯工艺占位。
-                您可以将其修改为您的本地电芯/动力包产品图：src={resolveUrl('/images/cell-pack.png')}
+                1. 彻底删除了先前添加的 `<div class="absolute inset-0 bg-slate-950/20"></div>` 变暗层。
+                2. 去掉了 `opacity-90`，图片不再半透明，底部的黑色完全不会再透出来。
+                3. 去掉了所有的 `brightness` 和 `contrast` CSS 滤镜，也去掉了多彩的光晕叠加。
+                现在，您的原图将以最真实、最明亮、原汁原味的日光状态完美展现！
               -->
-              <img 
-                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80" 
-                alt="IATF汽车级动力电芯PACK系统" 
-                class="max-h-[290px] object-contain rounded-xl transition-transform duration-500 group-hover:scale-105" 
-              />
+            </div>
+            
+            <!-- 内容排版容器 -->
+            <div class="relative z-10 w-full max-w-7xl mx-auto px-6 h-full flex flex-col lg:flex-row justify-between py-24 md:py-28 gap-10">
+              
+              <!-- 左侧：文字板块 -->
+              <div class="w-full lg:max-w-[480px] lg:self-end space-y-6">
+                <span class={`inline-block px-3 py-1 text-xs font-semibold rounded-full border ${badgeClass} backdrop-blur-sm`}>
+                  {badge}
+                </span>
+                <h2 class="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
+                  {title}，<br />
+                  <span class="text-slate-100">{subtitle}</span>
+                </h2>
+                <p class="text-slate-100 text-xs md:text-sm leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
+                  {description}
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                  <a href={resolveUrl(ctaLink1)} class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-center text-xs font-bold rounded-lg shadow-lg transition-colors">
+                    {ctaText1}
+                  </a>
+                  <a href={resolveUrl(ctaLink2)} class="px-6 py-3.5 border border-slate-600 hover:border-slate-400 text-center text-xs font-bold rounded-lg transition-colors text-slate-200 bg-slate-950/30 backdrop-blur-sm">
+                    {ctaText2}
+                  </a>
+                </div>
+              </div>
+              
+              <!-- 右侧：缩略图图集组 (去除了内衬灰色，绿框紧贴图片) -->
+              <div class="w-full lg:max-w-[420px] lg:self-end flex justify-center lg:justify-end gap-3 sm:gap-4 ml-auto">
+                {gallery.slice(0, 3).map((imgObj, imgIndex) => (
+                  <button 
+                    class="thumbnail-btn w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl overflow-hidden border-2 border-emerald-400 hover:border-emerald-300 hover:scale-105 active:scale-95 transition-all duration-300 bg-transparent group relative shadow-2xl focus:outline-none p-0" 
+                    data-img-url={imgObj.src} 
+                    aria-label={`查看高清大图 ${imgIndex + 1}`}
+                  >
+                    <!-- 
+                      - rounded-[14px] 能让图片角弧度与 2xl (16px) 的外框绿边实现完美的无缝贴合 
+                    -->
+                    <Image 
+                      src={imgObj} 
+                      alt={`缩略图 ${imgIndex + 1}`} 
+                      class="w-full h-full object-cover rounded-[14px]" 
+                      inferSize={true} 
+                    />
+                    <!-- 磨砂悬浮亮色遮罩，同样采用 rounded-[14px] 贴合 -->
+                    <div class="absolute inset-0 bg-slate-950/20 group-hover:bg-transparent transition-colors rounded-[14px]"></div>
+                  </button>
+                ))}
+              </div>
+              
             </div>
           </div>
-        </div>
-      </div>
-
+        );
+      })}
     </div>
 
-    <!-- 左右翻页控制器 -->
-    <button id="prev-slide" class="absolute left-4 top-1/2 -translate-y-1/2 z-30 hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-slate-850/50 hover:bg-emerald-500 border border-slate-700/50 hover:border-emerald-400 text-white transition-all duration-300 focus:outline-none backdrop-blur-sm" aria-label="Previous slide">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+    <!-- 左右控制器 -->
+    <button id="prev-slide" class="absolute left-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-11 h-11 rounded-full bg-slate-950/40 hover:bg-emerald-500 border border-slate-850 text-white transition-all duration-300 focus:outline-none backdrop-blur-sm" aria-label="Previous slide">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
     </button>
-    <button id="next-slide" class="absolute right-4 top-1/2 -translate-y-1/2 z-30 hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-slate-850/50 hover:bg-emerald-500 border border-slate-700/50 hover:border-emerald-400 text-white transition-all duration-300 focus:outline-none backdrop-blur-sm" aria-label="Next slide">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+    <button id="next-slide" class="absolute right-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-11 h-11 rounded-full bg-slate-950/40 hover:bg-emerald-500 border border-slate-850 text-white transition-all duration-300 focus:outline-none backdrop-blur-sm" aria-label="Next slide">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
     </button>
 
-    <!-- 进度指示器 Dots -->
+    <!-- 进度 Dots 指标 -->
     <div class="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 flex space-x-3">
-      <button class="carousel-dot w-6 h-3 rounded-full bg-emerald-500 transition-all duration-300" aria-label="Go to slide 1"></button>
-      <button class="carousel-dot w-3 h-3 rounded-full bg-slate-600 hover:bg-slate-500 transition-all duration-300" aria-label="Go to slide 2"></button>
-      <button class="carousel-dot w-3 h-3 rounded-full bg-slate-600 hover:bg-slate-500 transition-all duration-300" aria-label="Go to slide 3"></button>
+      {zhBanners.map((_, index) => (
+        <button 
+          class={`carousel-dot h-3 rounded-full transition-all duration-300 ${index === 0 ? 'bg-emerald-500 w-6' : 'bg-slate-600 hover:bg-slate-500 w-3'}`} 
+          aria-label={`Go to slide ${index + 1}`}
+        ></button>
+      ))}
     </div>
   </section>
 
   <!-- 3. 核心实力数据统计 -->
-  <section class="max-w-7xl mx-auto px-6 -mt-12 relative z-20">
+  <section class="max-w-7xl mx-auto px-6 -mt-12  relative z-20">
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
         <div class="text-3xl md:text-4xl font-extrabold text-emerald-600">15 GWh</div>
@@ -248,7 +188,7 @@ const featuredProducts = zhProducts.slice(0, 2);
   </section>
 
   <!-- 4. 推荐明星产品板块 (Featured Products) -->
-  <section class="max-w-7xl mx-auto px-6 py-20 bg-slate-100/50 rounded-3xl my-12 border border-slate-200/40">
+  <section class="max-w-7xl mx-auto px-6 py-2 bg-slate-100/50 rounded-3xl my-12 border border-slate-200/40">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
       <div>
         <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase">Star Products</span>
@@ -384,6 +324,22 @@ const featuredProducts = zhProducts.slice(0, 2);
     </div>
   </footer>
 
+  <!-- 7. 极简灯箱弹窗组件 (Lightbox Modal) -->
+  <div id="lightbox-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 backdrop-blur-md p-4">
+    <div class="relative max-w-4xl w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-4 md:p-6 shadow-[0_20px_50px_rgba(16,185,129,0.15)] animate-fade-in">
+      <!-- 关闭按钮 -->
+      <button id="close-lightbox" class="absolute -top-14 right-0 md:top-6 md:right-6 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-800 p-2.5 rounded-full border border-slate-800 transition-colors focus:outline-none" aria-label="关闭预览">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <!-- 高清展示大图 -->
+      <div class="flex items-center justify-center min-h-[300px] max-h-[70vh] overflow-hidden">
+        <img id="lightbox-img" src="" alt="产品集预览" class="max-h-[70vh] max-w-full object-contain rounded-2xl shadow-2xl transition-transform duration-300" />
+      </div>
+    </div>
+  </div>
+
 </body>
 
 <!-- 轮播过渡动效控制 -->
@@ -399,12 +355,19 @@ const featuredProducts = zhProducts.slice(0, 2);
     }
   }
   .carousel-slide.active {
-    display: grid !important;
+    display: flex !important;
     animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 </style>
 
-<!-- 轮播控制脚本与第一屏电芯数据监控模拟 -->
+<!-- 轮播控制脚本与图集弹窗交互逻辑 -->
 <script is:inline>
   // --- 1. 轮播图控制逻辑 ---
   const slides = document.querySelectorAll('.carousel-slide');
@@ -479,21 +442,52 @@ const featuredProducts = zhProducts.slice(0, 2);
   updateCarousel(0);
   startAutoPlay();
 
-  // --- 2. 模拟数据监控波动面板逻辑（仅服务于第一屏保留的仪表盘） ---
-  const vEl = document.getElementById('live-voltage');
-  const tEl = document.getElementById('live-temp');
-  
-  if (vEl && tEl) {
-    setInterval(() => {
-      // 电压在 3.280V ~ 3.288V 之间高频波动
-      const fakeVoltage = (3.280 + Math.random() * 0.008).toFixed(3);
-      vEl.textContent = `${fakeVoltage} V`;
-      
-      // 温度在 25.1℃ ~ 25.5℃ 之间平滑微动
-      const fakeTemp = (25.1 + Math.random() * 0.4).toFixed(1);
-      tEl.textContent = `${fakeTemp} ℃`;
-    }, 2000);
+  // --- 2. 灯箱弹窗 (Lightbox) 交互控制逻辑 ---
+  const lightboxModal = document.getElementById('lightbox-modal');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const closeLightboxBtn = document.getElementById('close-lightbox');
+  const thumbnailBtns = document.querySelectorAll('.thumbnail-btn');
+
+  thumbnailBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation(); // 阻止事件冒泡（防止干扰轮播悬停恢复）
+      const fullImgUrl = btn.getAttribute('data-img-url');
+      if (fullImgUrl && lightboxModal && lightboxImg) {
+        lightboxImg.src = fullImgUrl;
+        lightboxModal.classList.remove('hidden');
+        lightboxModal.classList.add('flex');
+        stopAutoPlay(); // 打开弹窗时暂停 Banner 的背景自动轮播
+      }
+    });
+  });
+
+  function closeLightbox() {
+    if (lightboxModal) {
+      lightboxModal.classList.add('hidden');
+      lightboxModal.classList.remove('flex');
+      startAutoPlay(); // 关闭弹窗后，恢复自动轮播
+    }
   }
+
+  if (closeLightboxBtn) {
+    closeLightboxBtn.addEventListener('click', closeLightbox);
+  }
+
+  if (lightboxModal) {
+    // 点击深色背景遮罩关闭弹窗
+    lightboxModal.addEventListener('click', (e) => {
+      if (e.target === lightboxModal) {
+        closeLightbox();
+      }
+    });
+  }
+
+  // 监听键盘 ESC 键关闭
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeLightbox();
+    }
+  });
 </script>
 
 </html>
