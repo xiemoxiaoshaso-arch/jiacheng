@@ -1,15 +1,14 @@
+---
 title: "JCA01 (24V-12Ah-288Wh)"
-lang: "zh" 
+lang: "zh"
 category: "电池包 (Battery Packs)"
-tags: ["后挂式"]
 chemistry: "磷酸铁锂 (LFP)"
-image: "../../assets/images/cell-280ah-1.png"   # 请根据实际图片路径和文件名进行修改
-images:                             
-  - "../../assets/images/cell-280ah-1.png"    # 角度1
-  - "../../assets/images/cell-280ah-2.png"    # 角度2（占位，如有可添加）
-  - "../../assets/images/cell-280ah-3.png"    # 角度3（背面或细节占位）
-datasheet: "/pdfs/LFP-280Ah-Datasheet.pdf"   # 请根据实际规格书路径修改，如无此文件可整行删除
-# 核心技术规格参数
+image: "../../assets/images/jca01-1.png"
+images:
+  - "../../assets/images/jca01-1.png"
+  - "../../assets/images/jca01-2.png"
+  - "../../assets/images/jca01-3.png"
+datasheet: "/pdfs/JCA01-Datasheet.pdf"
 specs:
   - name: "标称电压 (Nominal Voltage)"
     value: "24 V"
