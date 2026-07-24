@@ -1,37 +1,37 @@
----
-title: "LFP 280Ah 储能电芯"
+title: "JCA01 (24V-12Ah-288Wh)"
 lang: "zh" 
-category: "电芯 (Cells)"
+category: "电池包 (Battery Packs)"
+tags: ["后挂式"]
 chemistry: "磷酸铁锂 (LFP)"
-image: "../../assets/images/cell-280ah-1.png"   # 👈 已修改：改为相对路径以完美通过 image() 校验
-images:                             # 👈 新增多图列表，填入不同角度的图片路径
-  - "../../assets/images/cell-280ah-1.png"    # 角度1（正面）
-  - "../../assets/images/cell-280ah-2.png"    # 角度2（接线端子侧面占位）
+image: "../../assets/images/cell-280ah-1.png"   # 请根据实际图片路径和文件名进行修改
+images:                             
+  - "../../assets/images/cell-280ah-1.png"    # 角度1
+  - "../../assets/images/cell-280ah-2.png"    # 角度2（占位，如有可添加）
   - "../../assets/images/cell-280ah-3.png"    # 角度3（背面或细节占位）
-datasheet: "/pdfs/LFP-280Ah-Datasheet.pdf"
-# 以下是供前端表格渲染的详细参数（核心）
+datasheet: "/pdfs/LFP-280Ah-Datasheet.pdf"   # 请根据实际规格书路径修改，如无此文件可整行删除
+# 核心技术规格参数
 specs:
   - name: "标称电压 (Nominal Voltage)"
-    value: "3.2 V"
-  - name: "标称容量 (Nominal Capacity)"
-    value: "280 Ah"
-  - name: "额定能量 (Energy)"
-    value: "896 Wh"
-  - name: "循环寿命 (Cycle Life)"
-    value: "≥ 6000 次 (25℃, 0.5C/0.5C, 80% EOL)"
-  - name: "内阻 (Internal Resistance)"
-    value: "≤ 0.25 mΩ"
-  - name: "最大充放电倍率 (Max Charge/Discharge C-rate)"
-    value: "1.0 C / 1.0 C"
-  - name: "工作温度 (Operating Temperature)"
-    value: "充电: 0~55℃ / 放电: -20~55℃"
+    value: "24 V"
+  - name: "输出电流 (Output Current)"
+    value: "20 A"
   - name: "重量 (Weight)"
-    value: "5.3 ± 0.1 kg"
+    value: "≤ 3.2 kg"
+  - name: "电芯体系 (Chemistry)"
+    value: "磷酸铁锂 (LFP)"
+  - name: "标称容量 (Nominal Capacity)"
+    value: "12 Ah"
+  - name: "标称能量 (Energy)"
+    value: "288 Wh"
   - name: "尺寸 (Dimensions)"
-    value: "71.5 * 173.7 * 207.2 mm"
+    value: "250 * 205 * 80 mm"
+  - name: "工作环境温度 (Operating Temperature)"
+    value: "-5℃ ~ 35℃"
+  - name: "电池包连接 (Connector Type)"
+    value: "航空插头 / 安德森插头"
 ---
 
 ### 产品特点描述：
-1. **高安全性**：采用先进的磷酸铁锂材料体系，通过针刺、挤压等严苛安全测试。
-2. **长循环寿命**：专为工商业储能与电网级储能设计，循环寿命突破 6000 次。
-3. **一致性极佳**：全自动化生产线，保障电芯容量、内阻高度一致，提升整包（Pack）寿命。
+1. **后挂式设计**：专为特定设备设计的后挂结构，安装便捷，节省空间。
+2. **高安全性**：采用高安全性的磷酸铁锂电芯体系，提供稳定可靠的动力输出。
+3. **多接口支持**：配备标准的航空插头与安德森插头，适应多种充放电接口需求。
