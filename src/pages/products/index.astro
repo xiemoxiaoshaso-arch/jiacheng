@@ -220,11 +220,11 @@ import productsBanner from '../../assets/images/products-banner.jpg';
         // 1. 动态更新网页标题标签
         document.title = `${targetCategory} - 产品中心 - 嘉程新能源`;
         
-        // 2. 显示“当前分类：xxx”并填入文字
+        // 2. 显示“当前分类”提示条并填入文字
         const indicator = document.getElementById('category-filter-indicator');
         const textSpan = document.getElementById('category-filter-text');
         if (indicator && textSpan) {
-          textSpan.textContent = `当前分类：${targetCategory}`;
+          textSpan.textContent = targetCategory; // 👈 修改这里：只写入分类汉字（例如“底插式”）
           indicator.classList.remove('hidden');
         }
         
