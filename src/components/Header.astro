@@ -44,10 +44,10 @@ const menuTranslations = {
       href: '/products',
       children: [
         { name: '全部产品', href: '/products' },
-        { name: '后挂式', href: '/products/rear-mounted' }, // 👈 可根据您的 Astro 路由结构修改 href
-        { name: '底插式', href: '/products/bottom-insertion' },
-        { name: '快插式', href: '/products/quick-insertion' },
-        { name: '侧挂式', href: '/products/side-mounted' }
+        { name: '后挂式', href: '/products?category=rear-mounted' },
+        { name: '底插式', href: '/products?category=bottom-insertion' },
+        { name: '快插式', href: '/products?category=quick-insertion' },
+        { name: '侧挂式', href: '/products?category=side-mounted' }
       ]
     },
     { name: '招贤纳士', href: '/careers' },
@@ -62,10 +62,10 @@ const menuTranslations = {
       href: '/en/products',
       children: [
         { name: 'All Products', href: '/en/products' },
-        { name: 'Rear-mounted', href: '/en/products/rear-mounted' },
-        { name: 'Bottom-insertion', href: '/en/products/bottom-insertion' },
-        { name: 'Quick-insertion', href: '/en/products/quick-insertion' },
-        { name: 'Side-mounted', href: '/en/products/side-mounted' }
+        { name: 'Rear-mounted', href: '/en/products?category=rear-mounted' },
+        { name: 'Bottom-insertion', href: '/en/products?category=bottom-insertion' },
+        { name: 'Quick-insertion', href: '/en/products?category=quick-insertion' },
+        { name: 'Side-mounted', href: '/en/products?category=side-mounted' }
       ]
     },
     { name: 'Careers', href: '/en/careers' },
