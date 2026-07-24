@@ -29,21 +29,18 @@ const resolveUrl = (path: string) => {
   return `${base}${path}`;
 };
 
-// Specification translation mapping dictionary
-const specNameMap: Record<string, string> = {
-  '标称电压': 'Nominal Voltage',
-  '额定电压': 'Rated Voltage',
-  '标称容量': 'Nominal Capacity',
-  '额定容量': 'Rated Capacity',
-  '工作电压范围': 'Operating Voltage Range',
-  '内阻': 'Internal Impedance',
-  '最大连续充放电电流': 'Max. Continuous Charge/Discharge Current',
-  '最大持续电流': 'Max. Continuous Current',
-  '工作温度': 'Operating Temperature',
-  '存储温度': 'Storage Temperature',
-  '循环寿命': 'Cycle Life',
-  '重量': 'Weight',
-  '尺寸': 'Dimensions (W*D*H)'
+// 用您 Markdown 里实际的中英文双语参数名，作为翻译映射的键名 (Key)
+const specNameMap = {
+  '标称电压 (Nominal Voltage)': 'Nominal Voltage',
+  '输出电流 (Output Current)': 'Output Current',
+  '重量 (Weight)': 'Weight',
+  '电芯体系 (Chemistry)': 'Battery Chemistry',
+  '标称容量 (Nominal Capacity)': 'Nominal Capacity',
+  '标称能量 (Energy)': 'Nominal Energy',
+  '尺寸 (Dimensions)': 'Dimensions (W*D*H)',
+  '工作环境温度 (Operating Temperature)': 'Operating Temperature',
+  '电池包连接 (Connector Type)': 'Connector Type',
+  '安装方式 (Mounting Method)': 'Mounting Method'
 };
 
 const getCleanSpecName = (name: string) => {
