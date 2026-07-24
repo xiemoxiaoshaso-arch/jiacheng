@@ -1,7 +1,7 @@
 ---
 title: "JCA01 (24V-12Ah-288Wh)"
 lang: "zh"
-category: "电池包 (Battery Packs)"
+category: "后挂式"
 chemistry: "磷酸铁锂 (LFP)"
 image: "../../assets/images/cell-280ah-1.png"
 images:
