@@ -21,35 +21,9 @@ const getUrl = (img: any) => {
   return img.src; // Astro 编译后的优化图片对象其 .src 属性自带 Base 路径
 };
 
-// =================== 👈 方案 A 过滤逻辑开始 ===================
-
-// 1. 获取产品集合
+// 1. 获取产品集合：静态打包时直接提取全部中文产品
 const allProducts = await getCollection('products');
-
-// 2. 映射表：将 URL 中的英文 slug 对应到 Markdown 中的 category 汉字
-const categoryMap: Record<string, string> = {
-  'rear-mounted': '后挂式',
-  'bottom-insertion': '底插式',
-  'quick-insertion': '快插式',
-  'side-mounted': '侧挂式'
-};
-
-// 3. 提取 URL 参数（如：?category=rear-mounted）
-const categorySlug = Astro.url.searchParams.get('category');
-const activeCategoryName = categorySlug ? categoryMap[categorySlug] : null;
-
-// 4. 精准过滤产品数据（只提取中文，且支持分类过滤）
-const products = allProducts.filter(product => {
-  const isChinese = product.data.lang === 'zh';
-  if (activeCategoryName) {
-    // 如果存在分类参数，同时过滤语言和分类
-    return isChinese && product.data.category === activeCategoryName;
-  }
-  // 默认过滤出全部中文产品
-  return isChinese;
-});
-
-// =================== 👈 方案 A 过滤逻辑结束 ===================
+const products = allProducts.filter(product => product.data.lang === 'zh');
 
 // 2. 将数据转换为客户端 JavaScript 对比模块所需的轻量 JSON 格式
 const productsJSON = products.map(p => ({
@@ -69,8 +43,7 @@ import productsBanner from '../../assets/images/products-banner.jpg';
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
-  <!-- 👈 修改：让网页标签栏标题动态显示当前分类 -->
-  <title>{activeCategoryName ? `${activeCategoryName} - 产品中心` : '产品中心'} - 嘉程新能源</title>
+  <title>产品中心 - 嘉程新能源</title>
 </head>
 <body class="bg-slate-50 text-slate-800 relative antialiased">
 
@@ -79,7 +52,6 @@ import productsBanner from '../../assets/images/products-banner.jpg';
 
   <!-- 2. 产品中心 Banner 区域 -->
   <section class="relative w-full h-[300px] md:h-[400px] overflow-hidden flex items-center justify-center bg-slate-950 border-b border-slate-200/60">
-    <!-- 原生 Image 组件进行 build-time 优化，并应用 eager 加载提升 LCP 表现 -->
     <Image 
       src={productsBanner}
       alt="嘉程新能源产品中心" 
@@ -97,7 +69,7 @@ import productsBanner from '../../assets/images/products-banner.jpg';
     <!-- Banner 文本 -->
     <div class="relative z-10 max-w-5xl mx-auto text-center px-6 space-y-4">
       <span class="inline-block px-3 py-1 bg-green-500/20 text-green-300 text-[10px] font-bold tracking-widest uppercase rounded-full border border-green-500/30 animate-pulse">
-        {activeCategoryName ? `产品分类 // ${categorySlug?.toUpperCase()}` : '产品中心 // PRODUCT CATALOG'}
+        产品中心 // PRODUCT CATALOG
       </span>
       <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.3)] md:whitespace-nowrap">
         <span class="inline-block">智能电池方案，</span><span class="inline-block">赋能全场景应用</span>
@@ -106,86 +78,85 @@ import productsBanner from '../../assets/images/products-banner.jpg';
         AUTOMOTIVE-GRADE CELLS, EXPERT PACK & ESS INTEGRATION
       </p>
 
-      <!-- 👈 新增：如果当前处于分类状态，展示当前分类并提供便捷清除过滤按钮 -->
-      {activeCategoryName && (
-        <div class="pt-2 flex items-center justify-center gap-2">
-          <span class="px-3 py-1 bg-green-600 text-slate-950 text-xs font-black rounded-full shadow-md">
-            当前分类：{activeCategoryName}
-          </span>
-          <a 
-            href={resolveUrl('/products')} 
-            class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-full transition-all border border-white/20"
-          >
-            显示全部 ✕
-          </a>
-        </div>
-      )}
+      <!-- 👈 新增：客户端控制显隐的分类指示条（初始化时默认隐藏） -->
+      <div id="category-filter-indicator" class="pt-2 flex items-center justify-center gap-2 hidden">
+        <span id="category-filter-text" class="px-3 py-1 bg-green-600 text-slate-950 text-xs font-black rounded-full shadow-md">
+          当前分类：
+        </span>
+        <a 
+          href={resolveUrl('/products')} 
+          class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-full transition-all border border-white/20"
+        >
+          显示全部 ✕
+        </a>
+      </div>
     </div>
   </section>
 
   <!-- 4. 产品目录列表主区域 -->
   <main class="max-w-7xl mx-auto px-4 py-12 pb-32">
-    <!-- 如果该分类下没有对应产品，展示友好提示 -->
-    {products.length === 0 ? (
-      <div class="bg-white border border-slate-200 rounded-2xl py-16 text-center text-slate-400 shadow-sm max-w-2xl mx-auto">
-        <div class="text-4xl mb-3">📦</div>
-        <p class="text-sm font-semibold text-slate-500 mb-1">该分类下暂无发布的产品</p>
-        <p class="text-xs text-slate-400">我们将尽快完善此类产品信息，敬请期待。</p>
-        <a href={resolveUrl('/products')} class="mt-4 inline-block px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">
-          返回全部产品
-        </a>
-      </div>
-    ) : (
-      /* 产品网格卡片 */
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {products.map(product => (
-          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
+    <!-- 👈 新增：当没有筛选结果时显示的空状态（初始化默认隐藏） -->
+    <div id="empty-state" class="hidden bg-white border border-slate-200 rounded-2xl py-16 text-center text-slate-400 shadow-sm max-w-2xl mx-auto">
+      <div class="text-4xl mb-3">📦</div>
+      <p class="text-sm font-semibold text-slate-500 mb-1">该分类下暂无发布的产品</p>
+      <p class="text-xs text-slate-400">我们将尽快完善此类产品信息，敬请期待。</p>
+      <a href={resolveUrl('/products')} class="mt-4 inline-block px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">
+        返回全部产品
+      </a>
+    </div>
+
+    <!-- 产品网格卡片（👈 新增了 id="products-grid" 用于客户端隐藏/显示控制） -->
+    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {products.map(product => (
+        /* 👈 新增 data-category 属性，便于客户端 JS 读取并筛选 */
+        <div 
+          class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group"
+          data-category={product.data.category}
+        >
+          <!-- 参数对比勾选框 -->
+          <label class="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 cursor-pointer shadow-sm select-none">
+            <input type="checkbox" class="compare-checkbox w-4 h-4 accent-green-600 cursor-pointer" data-id={product.id} />
+            对比参数
+          </label>
+
+          <div class="p-6 pt-14">
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-xs font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+                {product.data.chemistry}
+              </span>
+              <span class="inline-flex items-center justify-center px-3.5 py-1 text-xs font-bold text-white bg-orange-500 rounded-full shadow-sm">
+                {product.data.category}
+              </span>
+            </div>
             
-            <!-- 参数对比勾选框 -->
-            <label class="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 cursor-pointer shadow-sm select-none">
-              <input type="checkbox" class="compare-checkbox w-4 h-4 accent-green-600 cursor-pointer" data-id={product.id} />
-              对比参数
-            </label>
-
-            <div class="p-6 pt-14">
-              <div class="flex justify-between items-center mb-4">
-                <span class="text-xs font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
-                  {product.data.chemistry}
-                </span>
-                <span class="inline-flex items-center justify-center px-3.5 py-1 text-xs font-bold text-white bg-orange-500 rounded-full shadow-sm">
-                  {product.data.category}
-                </span>
-              </div>
-              
-              <div class="h-48 w-full bg-slate-50 rounded-lg flex items-center justify-center p-4 mb-4 border border-slate-100">
-                <Image 
-                  src={product.data.image} 
-                  alt={product.data.title} 
-                  width={350}
-                  height={200}
-                  widths={[200, 350]}
-                  sizes="(max-width: 768px) 100vw, 350px"
-                  class="max-h-full object-contain" 
-                />
-              </div>
-
-              <h2 class="text-xl font-bold text-slate-900 mb-2">{product.data.title}</h2>
-              
-              <div class="space-y-1 text-sm text-slate-500 border-t border-slate-100 pt-3">
-                <div>容量：<span class="font-semibold text-slate-800">{product.data.specs.find((s: any) => s.name.includes('容量'))?.value || '详见参数表'}</span></div>
-                <div>电压：<span class="font-semibold text-slate-800">{product.data.specs.find((s: any) => s.name.includes('电压'))?.value || '详见参数表'}</span></div>
-              </div>
+            <div class="h-48 w-full bg-slate-50 rounded-lg flex items-center justify-center p-4 mb-4 border border-slate-100">
+              <Image 
+                src={product.data.image} 
+                alt={product.data.title} 
+                width={350}
+                height={200}
+                widths={[200, 350]}
+                sizes="(max-width: 768px) 100vw, 350px"
+                class="max-h-full object-contain" 
+              />
             </div>
 
-            <div class="p-6 bg-slate-50 border-t border-slate-100">
-              <a href={resolveUrl(`/products/${product.id}`)} class="block w-full py-2 bg-slate-900 hover:bg-slate-800 text-white text-center text-sm font-semibold rounded-lg transition-colors">
-                查看详细技术参数 ➔
-              </a>
+            <h2 class="text-xl font-bold text-slate-900 mb-2">{product.data.title}</h2>
+            
+            <div class="space-y-1 text-sm text-slate-500 border-t border-slate-100 pt-3">
+              <div>容量：<span class="font-semibold text-slate-800">{product.data.specs.find((s: any) => s.name.includes('容量'))?.value || '详见参数表'}</span></div>
+              <div>电压：<span class="font-semibold text-slate-800">{product.data.specs.find((s: any) => s.name.includes('电压'))?.value || '详见参数表'}</span></div>
             </div>
           </div>
-        ))}
-      </div>
-    )}
+
+          <div class="p-6 bg-slate-50 border-t border-slate-100">
+            <a href={resolveUrl(`/products/${product.id}`)} class="block w-full py-2 bg-slate-900 hover:bg-slate-800 text-white text-center text-sm font-semibold rounded-lg transition-colors">
+              查看详细技术参数 ➔
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
   </main>
 
   <!-- 右下角悬浮对比启动条 -->
@@ -229,7 +200,59 @@ import productsBanner from '../../assets/images/products-banner.jpg';
     </div>
   </footer>
 
-  <!-- 客户端对比脚本逻辑 -->
+  <!-- 👈 新增：客户端纯静态过滤脚本逻辑 -->
+  <script is:inline>
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const categorySlug = urlParams.get('category');
+      
+      const categoryMap = {
+        'rear-mounted': '后挂式',
+        'bottom-insertion': '底插式',
+        'quick-insertion': '快插式',
+        'side-mounted': '侧挂式'
+      };
+      
+      if (categorySlug && categoryMap[categorySlug]) {
+        const targetCategory = categoryMap[categorySlug];
+        
+        // 1. 动态更新网页标题标签
+        document.title = `${targetCategory} - 产品中心 - 嘉程新能源`;
+        
+        // 2. 显示“当前分类：xxx”并填入文字
+        const indicator = document.getElementById('category-filter-indicator');
+        const textSpan = document.getElementById('category-filter-text');
+        if (indicator && textSpan) {
+          textSpan.textContent = `当前分类：${targetCategory}`;
+          indicator.classList.remove('hidden');
+        }
+        
+        // 3. 筛选卡片显隐
+        const cards = document.querySelectorAll('[data-category]');
+        let visibleCount = 0;
+        
+        cards.forEach(card => {
+          const cardCategory = card.getAttribute('data-category');
+          if (cardCategory === targetCategory) {
+            card.style.display = 'flex'; // 保留其原有的 flex 布局样式
+            visibleCount++;
+          } else {
+            card.style.display = 'none'; // 隐藏非目标分类产品
+          }
+        });
+        
+        // 4. 如果过滤后完全没有产品，展示空状态提示页，并隐藏网格容器
+        if (visibleCount === 0) {
+          const emptyState = document.getElementById('empty-state');
+          const grid = document.getElementById('products-grid');
+          if (emptyState) emptyState.classList.remove('hidden');
+          if (grid) grid.classList.add('hidden');
+        }
+      }
+    })();
+  </script>
+
+  <!-- 原有客户端对比脚本逻辑（👈 内部 define:vars 变量保持原样） -->
   <script is:inline define:vars={{ productsJSON }}>
     let selectedIds = [];
     const compareBar = document.getElementById('compare-bar');
