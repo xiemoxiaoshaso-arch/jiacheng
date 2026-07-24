@@ -77,24 +77,25 @@ import productsBanner from '../../assets/images/products-banner.jpg';
       <p class="text-green-400 font-extrabold text-[10px] md:text-xs tracking-wider uppercase font-mono drop-shadow-[0_1px_5px_rgba(0,0,0,0.3)]">
         AUTOMOTIVE-GRADE CELLS, EXPERT PACK & ESS INTEGRATION
       </p>
-
-      <!-- 👈 新增：客户端控制显隐的分类指示条（初始化时默认隐藏） -->
-      <div id="category-filter-indicator" class="pt-2 flex items-center justify-center gap-2 hidden">
-        <span id="category-filter-text" class="px-3 py-1 bg-green-600 text-slate-950 text-xs font-black rounded-full shadow-md">
-          当前分类：
-        </span>
-        <a 
-          href={resolveUrl('/products')} 
-          class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-full transition-all border border-white/20"
-        >
-          显示全部 ✕
-        </a>
-      </div>
     </div>
   </section>
 
   <!-- 4. 产品目录列表主区域 -->
   <main class="max-w-7xl mx-auto px-4 py-12 pb-32">
+    <!-- 👈 新增：客户端控制显隐的分类指示条（初始化时默认隐藏） -->
+    <div id="category-filter-indicator" class="mb-8 p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hidden">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">当前筛选：</span>
+        <span id="category-filter-text" class="inline-flex items-center justify-center px-3.5 py-1 text-xs font-bold text-white bg-green-600 rounded-full shadow-sm">
+        </span>
+      </div>
+      <a 
+        href={resolveUrl('/products')} 
+        class="inline-flex items-center justify-center gap-1 text-xs font-bold text-slate-500 hover:text-red-500 transition-colors bg-slate-100 hover:bg-red-50 px-3.5 py-1.5 rounded-lg border border-slate-200/60"
+      >
+        显示全部 ✕
+      </a>
+    </div>
     <!-- 👈 新增：当没有筛选结果时显示的空状态（初始化默认隐藏） -->
     <div id="empty-state" class="hidden bg-white border border-slate-200 rounded-2xl py-16 text-center text-slate-400 shadow-sm max-w-2xl mx-auto">
       <div class="text-4xl mb-3">📦</div>
