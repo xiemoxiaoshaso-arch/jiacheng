@@ -21,43 +21,11 @@ const getUrl = (img: any) => {
   return img.src; // Astro optimized image object .src property contains base path
 };
 
-// =================== 👈 Option A: Query Filter Logic Starts ===================
-
 // 1. Fetch all products
 const allProducts = await getCollection('products');
 
-// 2. Compatibility Mapping: Maps URL slug to all possible YAML category values (supporting both Chinese and translated English values)
-const categoryMap: Record<string, string[]> = {
-  'rear-mounted': ['后挂式', 'Rear-mounted', 'rear-mounted'],
-  'bottom-insertion': ['底插式', 'Bottom-insertion', 'bottom-insertion'],
-  'quick-insertion': ['快插式', 'Quick-insertion', 'quick-insertion'],
-  'side-mounted': ['侧挂式', 'Side-mounted', 'side-mounted']
-};
-
-// 3. Mapping for UI and Tab Title display
-const displayTitleMap: Record<string, string> = {
-  'rear-mounted': 'Rear-mounted',
-  'bottom-insertion': 'Bottom-insertion',
-  'quick-insertion': 'Quick-insertion',
-  'side-mounted': 'Side-mounted'
-};
-
-// 4. Extract URL search parameter (e.g., ?category=rear-mounted)
-const categorySlug = Astro.url.searchParams.get('category');
-const possibleCategories = categorySlug ? categoryMap[categorySlug] : null;
-const activeCategoryDisplayName = categorySlug ? displayTitleMap[categorySlug] : null;
-
-// 5. Filter English products (with dynamic category filtering)
-const products = allProducts.filter(product => {
-  const isEnglish = product.data.lang === 'en';
-  if (possibleCategories) {
-    // Matches if the product language is English and its YAML category exists in the mapped array
-    return isEnglish && possibleCategories.includes(product.data.category);
-  }
-  return isEnglish;
-});
-
-// =================== 👈 Option A: Query Filter Logic Ends ===================
+// 2. Filter only English products based on Frontmatter lang === 'en' (Keep complete list at build-time for client-side filtering)
+const products = allProducts.filter(product => product.data.lang === 'en');
 
 // 3. Serialize products spec parameters to safe light-weight JSON for client-side comparison
 const productsJSON = products.map(p => ({
@@ -77,8 +45,7 @@ import productsBanner from '../../../assets/images/products-banner.jpg';
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
-  <!-- 👈 Dynamically update the tab title based on selected category -->
-  <title>{activeCategoryDisplayName ? `${activeCategoryDisplayName} - Product Catalog` : 'Product Catalog'} - JC New Energy</title>
+  <title>Product Catalog - JC New Energy</title>
 </head>
 <body class="bg-slate-50 text-slate-800 relative font-sans antialiased">
 
@@ -102,7 +69,7 @@ import productsBanner from '../../../assets/images/products-banner.jpg';
 
     <div class="relative z-10 max-w-5xl mx-auto text-center px-4 md:px-8 space-y-4">
       <span class="inline-block px-3 py-1 bg-green-500/20 text-green-300 text-[10px] font-bold tracking-widest uppercase rounded-full border border-green-500/30 animate-pulse">
-        {activeCategoryDisplayName ? `Product Category // ${categorySlug?.toUpperCase()}` : 'Product Catalog // Smart Battery Solutions'}
+        Product Catalog // Smart Battery Solutions
       </span>
       <h1 class="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.3)]">
         Smart Energy Storage, <br class="hidden md:inline" />Powering Global Applications
@@ -111,93 +78,94 @@ import productsBanner from '../../../assets/images/products-banner.jpg';
         AUTOMOTIVE-GRADE CELLS, EXPERT PACK & ESS INTEGRATION
       </p>
 
-      <!-- 👈 Added: Category badge and 'Show All' clear button when filtered -->
-      {activeCategoryDisplayName && (
-        <div class="pt-2 flex items-center justify-center gap-2">
-          <span class="px-3 py-1 bg-green-600 text-slate-950 text-xs font-black rounded-full shadow-md">
-            Category: {activeCategoryDisplayName}
-          </span>
-          <a 
-            href={resolveUrl('/en/products')} 
-            class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-full transition-all border border-white/20"
-          >
-            Show All ✕
-          </a>
-        </div>
-      )}
+      <!-- 👈 Added: Client-controlled English Category Filter Indicator (hidden by default) -->
+      <div id="category-filter-indicator" class="pt-2 flex items-center justify-center gap-2 hidden">
+        <span id="category-filter-text" class="px-3 py-1 bg-green-600 text-slate-950 text-xs font-black rounded-full shadow-md">
+          Category: 
+        </span>
+        <a 
+          href={resolveUrl('/en/products')} 
+          class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-full transition-all border border-white/20"
+        >
+          Show All ✕
+        </a>
+      </div>
     </div>
   </section>
 
   <!-- 3. Product Directory Main Grid Area -->
   <main class="max-w-7xl mx-auto px-4 py-16 pb-32">
-    {products.length === 0 ? (
-      /* 👈 Elegant empty state UI for empty categories */
-      <div class="bg-white border border-slate-200 rounded-2xl py-16 text-center text-slate-400 shadow-sm max-w-2xl mx-auto">
-        <div class="text-4xl mb-3">📦</div>
-        <p class="text-sm font-semibold text-slate-500 mb-1">No products found in this category</p>
-        <p class="text-xs text-slate-400">We will update the product catalog soon. Please stay tuned.</p>
-        <a href={resolveUrl('/en/products')} class="mt-4 inline-block px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">
-          Back to All Products
-        </a>
-      </div>
-    ) : (
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {products.map(product => (
-          <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md hover:border-green-500/20 transition-all duration-300 flex flex-col justify-between relative group">
-            
-            <label class="absolute top-4 left-4 z-10 flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-slate-200/80 text-[11px] font-bold text-slate-600 cursor-pointer shadow-sm select-none uppercase tracking-wider hover:text-slate-900 transition-colors">
-              <input type="checkbox" class="compare-checkbox w-4 h-4 accent-green-600 cursor-pointer rounded-md" data-id={product.id} />
-              Compare
-            </label>
+    <!-- 👈 Added: Elegant empty state UI for empty categories (hidden by default) -->
+    <div id="empty-state" class="hidden bg-white border border-slate-200 rounded-2xl py-16 text-center text-slate-400 shadow-sm max-w-2xl mx-auto">
+      <div class="text-4xl mb-3">📦</div>
+      <p class="text-sm font-semibold text-slate-500 mb-1">No products found in this category</p>
+      <p class="text-xs text-slate-400">We will update the product catalog soon. Please stay tuned.</p>
+      <a href={resolveUrl('/en/products')} class="mt-4 inline-block px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">
+        Back to All Products
+      </a>
+    </div>
 
-            <div class="p-6 pt-16">
-              <div class="flex justify-between items-center mb-4">
-                <span class="text-xs font-bold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100 uppercase tracking-wider">
-                  {product.data.chemistry}
-                </span>
-                <span class="inline-flex items-center justify-center px-3.5 py-1 text-xs font-bold text-white bg-orange-500 rounded-full shadow-sm">
-                  {product.data.category}
-                </span>
-              </div>
-              
-              <div class="h-48 w-full bg-slate-50/50 rounded-xl flex items-center justify-center p-6 mb-6 border border-slate-100 group-hover:bg-slate-50 transition-colors">
-                <Image 
-                  src={product.data.image} 
-                  alt={product.data.title} 
-                  width={350}
-                  height={200}
-                  widths={[200, 350]}
-                  sizes="(max-width: 768px) 100vw, 350px"
-                  class="max-h-full object-contain group-hover:scale-105 transition-transform duration-500" 
-                />
-              </div>
-              <h2 class="text-lg md:text-xl font-black text-slate-900 tracking-tight mb-3 line-clamp-1">{product.data.title}</h2>
-              
-              <div class="space-y-1.5 text-xs md:text-sm text-slate-500 border-t border-slate-150 pt-4 font-medium">
-                <div class="flex justify-between">
-                  <span>Capacity:</span> 
-                  <span class="font-bold text-slate-800">
-                    {product.data.specs.find((s: any) => s.name.toLowerCase().includes('容量') || s.name.toLowerCase().includes('capacity'))?.value || 'See Datasheet'}
-                  </span>
-                </div>
-                <div class="flex justify-between">
-                  <span>Voltage:</span> 
-                  <span class="font-bold text-slate-800">
-                    {product.data.specs.find((s: any) => s.name.toLowerCase().includes('电压') || s.name.toLowerCase().includes('voltage'))?.value || 'See Datasheet'}
-                  </span>
-                </div>
-              </div>
+    <!-- Product grid container (👈 Added: id="products-grid" for client-side filtering) -->
+    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {products.map(product => (
+        /* 👈 Added: data-category attribute containing raw markdown category text */
+        <div 
+          class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md hover:border-green-500/20 transition-all duration-300 flex flex-col justify-between relative group"
+          data-category={product.data.category}
+        >
+          <!-- Compare checkbox -->
+          <label class="absolute top-4 left-4 z-10 flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-slate-200/80 text-[11px] font-bold text-slate-600 cursor-pointer shadow-sm select-none uppercase tracking-wider hover:text-slate-900 transition-colors">
+            <input type="checkbox" class="compare-checkbox w-4 h-4 accent-green-600 cursor-pointer rounded-md" data-id={product.id} />
+            Compare
+          </label>
+
+          <div class="p-6 pt-16">
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-xs font-bold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100 uppercase tracking-wider">
+                {product.data.chemistry}
+              </span>
+              <span class="inline-flex items-center justify-center px-3.5 py-1 text-xs font-bold text-white bg-orange-500 rounded-full shadow-sm">
+                {product.data.category}
+              </span>
             </div>
-
-            <div class="p-6 bg-slate-50/50 border-t border-slate-100">
-              <a href={resolveUrl(`/en/products/${product.id}`)} class="block w-full py-3 bg-slate-900 hover:bg-slate-800 text-white text-center text-xs font-bold rounded-xl transition-colors uppercase tracking-widest">
-                Technical Datasheet ➔
-              </a>
+            
+            <div class="h-48 w-full bg-slate-50/50 rounded-xl flex items-center justify-center p-6 mb-6 border border-slate-100 group-hover:bg-slate-50 transition-colors">
+              <Image 
+                src={product.data.image} 
+                alt={product.data.title} 
+                width={350}
+                height={200}
+                widths={[200, 350]}
+                sizes="(max-width: 768px) 100vw, 350px"
+                class="max-h-full object-contain group-hover:scale-105 transition-transform duration-500" 
+              />
+            </div>
+            <h2 class="text-lg md:text-xl font-black text-slate-900 tracking-tight mb-3 line-clamp-1">{product.data.title}</h2>
+            
+            <div class="space-y-1.5 text-xs md:text-sm text-slate-500 border-t border-slate-150 pt-4 font-medium">
+              <div class="flex justify-between">
+                <span>Capacity:</span> 
+                <span class="font-bold text-slate-800">
+                  {product.data.specs.find((s: any) => s.name.toLowerCase().includes('容量') || s.name.toLowerCase().includes('capacity'))?.value || 'See Datasheet'}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span>Voltage:</span> 
+                <span class="font-bold text-slate-800">
+                  {product.data.specs.find((s: any) => s.name.toLowerCase().includes('电压') || s.name.toLowerCase().includes('voltage'))?.value || 'See Datasheet'}
+                </span>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-    )}
+
+          <div class="p-6 bg-slate-50/50 border-t border-slate-100">
+            <a href={resolveUrl(`/en/products/${product.id}`)} class="block w-full py-3 bg-slate-900 hover:bg-slate-800 text-white text-center text-xs font-bold rounded-xl transition-colors uppercase tracking-widest">
+              Technical Datasheet ➔
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
   </main>
 
   <!-- Bottom Floating Compare Selection Bar -->
@@ -238,6 +206,68 @@ import productsBanner from '../../../assets/images/products-banner.jpg';
     </div>
   </footer>
 
+  <!-- 👈 Added: Client-side pure static filtering script for SSG English Page -->
+  <script is:inline>
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const categorySlug = urlParams.get('category');
+      
+      // Dual-compatibility mapping to support both Chinese and English tags inside product YAML
+      const categoryMap = {
+        'rear-mounted': ['后挂式', 'Rear-mounted', 'rear-mounted'],
+        'bottom-insertion': ['底插式', 'Bottom-insertion', 'bottom-insertion'],
+        'quick-insertion': ['快插式', 'Quick-insertion', 'quick-insertion'],
+        'side-mounted': ['侧挂式', 'Side-mounted', 'side-mounted']
+      };
+
+      const displayTitleMap = {
+        'rear-mounted': 'Rear-mounted',
+        'bottom-insertion': 'Bottom-insertion',
+        'quick-insertion': 'Quick-insertion',
+        'side-mounted': 'Side-mounted'
+      };
+      
+      if (categorySlug && categoryMap[categorySlug]) {
+        const possibleTargets = categoryMap[categorySlug];
+        const displayTitle = displayTitleMap[categorySlug];
+        
+        // 1. Dynamically update HTML document title
+        document.title = `${displayTitle} - Product Catalog - JC New Energy`;
+        
+        // 2. Show filter badge and insert display text
+        const indicator = document.getElementById('category-filter-indicator');
+        const textSpan = document.getElementById('category-filter-text');
+        if (indicator && textSpan) {
+          textSpan.textContent = `Category: ${displayTitle}`;
+          indicator.classList.remove('hidden');
+        }
+        
+        // 3. Filter card nodes DOM visibility
+        const cards = document.querySelectorAll('[data-category]');
+        let visibleCount = 0;
+        
+        cards.forEach(card => {
+          const cardCategory = card.getAttribute('data-category');
+          if (possibleTargets.includes(cardCategory)) {
+            card.style.display = 'flex'; // Preserve its native flex column layout style
+            visibleCount++;
+          } else {
+            card.style.display = 'none'; // Hide non-target category items
+          }
+        });
+        
+        // 4. Handle empty states if no items matched
+        if (visibleCount === 0) {
+          const emptyState = document.getElementById('empty-state');
+          const grid = document.getElementById('products-grid');
+          if (emptyState) emptyState.classList.remove('hidden');
+          if (grid) grid.classList.add('hidden');
+        }
+      }
+    })();
+  </script>
+
+  <!-- Universal Comparison Script Block -->
   <script is:inline define:vars={{ productsJSON }}>
     let selectedIds = [];
     const compareBar = document.getElementById('compare-bar');
@@ -251,18 +281,16 @@ import productsBanner from '../../../assets/images/products-banner.jpg';
 
     // Localization mapping dictionary for technical specification key translations
     const specNameMap = {
-      '标称电压': 'Nominal Voltage',
-      '额定电压': 'Rated Voltage',
-      '标称容量': 'Nominal Capacity',
-      '额定容量': 'Rated Capacity',
-      '工作电压范围': 'Operating Voltage Range',
-      '内阻': 'Internal Impedance',
-      '最大连续充放电电流': 'Max. Continuous Charge/Discharge Current',
-      '工作温度': 'Operating Temperature',
-      '存储温度': 'Storage Temperature',
-      '循环寿命': 'Cycle Life',
-      '重量': 'Weight',
-      '尺寸': 'Dimensions (W*D*H)'
+      '标称电压 (Nominal Voltage)': 'Nominal Voltage',
+      '输出电流 (Output Current)': 'Output Current',
+      '重量 (Weight)': 'Weight',
+      '电芯体系 (Chemistry)': 'Battery Chemistry',
+      '标称容量 (Nominal Capacity)': 'Nominal Capacity',
+      '标称能量 (Energy)': 'Nominal Energy',
+      '尺寸 (Dimensions)': 'Dimensions (W*D*H)',
+      '工作环境温度 (Operating Temperature)': 'Operating Temperature',
+      '电池包连接 (Connector Type)': 'Connector Type',
+      '安装方式 (Mounting Method)': 'Mounting Method'
     };
 
     const getCleanSpecName = (name) => {
