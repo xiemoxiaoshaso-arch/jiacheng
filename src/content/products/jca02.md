@@ -3,11 +3,9 @@ title: "JCA02 (24V-15Ah-384Wh)"
 lang: "zh"
 category: "后挂式"
 chemistry: "磷酸铁锂 (LFP)"
-image: "../../assets/images/jca02-1.png"
+image: "../../assets/images/jca02-1.jpg"
 images:
-  - "../../assets/images/jca02-1.png"
-  - "../../assets/images/jca02-2.png"
-  - "../../assets/images/jca02-3.png"
+  - "../../assets/images/jca02-1.jpg"
 datasheet: "/pdfs/JCA02-Datasheet.pdf"
 specs:
   - name: "标称电压 (Nominal Voltage)"

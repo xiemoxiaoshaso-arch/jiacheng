@@ -3,9 +3,9 @@ title: "JCA02 (24V-15Ah-384Wh)"
 lang: "en"
 category: "Rear-mounted"
 chemistry: "LiFePO4 (LFP)"
-image: "../../assets/images/jca02-1.png"
+image: "../../assets/images/jca02-1.jpg"
 images:
-  - "../../assets/images/jca02-1.png"
+  - "../../assets/images/jca02-1.jpg"
 datasheet: "/pdfs/JCA02-Datasheet.pdf"
 specs:
   - name: "Nominal Voltage"
