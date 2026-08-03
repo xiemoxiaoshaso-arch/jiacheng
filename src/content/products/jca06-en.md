@@ -3,10 +3,10 @@ title: "JCA06 (24V-15Ah-384Wh)"
 lang: "en"
 category: "Side-mounted"
 chemistry: "LiFePO4 (LFP)"
-image: "../../assets/images/jca06-1.png"
+image: "../../assets/images/jca06-1.jpg"
 images:
-  - "../../assets/images/jca06-1.png"
-datasheet: "/pdfs/JCA06-Datasheet.pdf"
+  - "../../assets/images/jca06-1.jpg"
+datasheet: "/pdfs/Datasheet.pdf"
 specs:
   - name: "Nominal Voltage"
     value: "24 V"

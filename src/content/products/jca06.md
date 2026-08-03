@@ -6,7 +6,7 @@ chemistry: "磷酸铁锂 (LFP)"
 image: "../../assets/images/jca06-1.jpg"
 images:
   - "../../assets/images/jca06-1.jpg"
-datasheet: "/pdfs/JCA06-Datasheet.pdf"
+datasheet: "/pdfs/Datasheet.pdf"
 specs:
   - name: "标称电压 (Nominal Voltage)"
     value: "24 V"
