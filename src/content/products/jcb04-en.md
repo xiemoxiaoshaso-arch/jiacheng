@@ -3,9 +3,10 @@ title: "JCB04 (24V-30Ah-720Wh)"
 lang: "en"
 category: "Bottom-insertion"
 chemistry: "LiFePO4 (LFP)"
-image: "../../assets/images/jcb04-1.png"
+image: "../../assets/images/jcb04-1.jpg"
 images:
-  - "../../assets/images/jcb04-1.png"
+  - "../../assets/images/jcb04-1.jpg"
+  - "../../assets/images/jcb04-2.jpg"
 datasheet: "/pdfs/JCB04-Datasheet.pdf"
 specs:
   - name: "Nominal Voltage"
