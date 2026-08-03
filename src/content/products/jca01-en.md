@@ -3,9 +3,11 @@ title: "JCA01 (24V-12Ah-288Wh)"
 lang: "en"
 category: "Rear-mounted"
 chemistry: "LiFePO4 (LFP)"
-image: "../../assets/images/jca01-1.png"
+image: "../../assets/images/jca01-1.jpg"
 images:
-  - "../../assets/images/jca01-1.png"
+  - "../../assets/images/jca01-1.jpg"
+  - "../../assets/images/jca01-2.jpg"
+  - "../../assets/images/jca01-3.jpg"
 datasheet: "/pdfs/JCA01-Datasheet.pdf"
 specs:
   - name: "Nominal Voltage"
