@@ -6,6 +6,8 @@ chemistry: "磷酸铁锂 (LFP)"
 image: "../../assets/images/jca02-1.jpg"
 images:
   - "../../assets/images/jca02-1.jpg"
+  - "../../assets/images/jca-bei.jpg"
+  - "../../assets/images/jca-chong.jpg"
 datasheet: "/pdfs/JCA02-Datasheet.pdf"
 specs:
   - name: "标称电压 (Nominal Voltage)"

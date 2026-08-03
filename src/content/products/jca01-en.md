@@ -6,8 +6,8 @@ chemistry: "LiFePO4 (LFP)"
 image: "../../assets/images/jca01-1.jpg"
 images:
   - "../../assets/images/jca01-1.jpg"
-  - "../../assets/images/jca01-2.jpg"
-  - "../../assets/images/jca01-3.jpg"
+  - "../../assets/images/jca-bei.jpg"
+  - "../../assets/images/jca-chong.jpg"
 datasheet: "/pdfs/JCA01-Datasheet.pdf"
 specs:
   - name: "Nominal Voltage"
