@@ -7,6 +7,7 @@ image: "../../assets/images/jcb02-1.jpg"
 images:
   - "../../assets/images/jcb02-1.jpg"
   - "../../assets/images/jcb02-2.jpg"
+  - "../../assets/images/jcb02-3.jpg"
 datasheet: "/pdfs/Datasheet.pdf"
 specs:
   - name: "Nominal Voltage"

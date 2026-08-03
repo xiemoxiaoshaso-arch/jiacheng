@@ -7,6 +7,7 @@ image: "../../assets/images/jcb02-1.jpg"
 images:
   - "../../assets/images/jcb02-1.jpg"
   - "../../assets/images/jcb02-2.jpg"
+  - "../../assets/images/jcb02-3.jpg"
 datasheet: "/pdfs/JCB02-Datasheet.pdf"
 specs:
   - name: "标称电压 (Nominal Voltage)"
